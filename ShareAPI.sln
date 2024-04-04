@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34707.107
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareAPI", "ShareAPI.csproj", "{07D340EC-BBEE-4030-A832-D5FC81D4B680}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07D340EC-BBEE-4030-A832-D5FC81D4B680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07D340EC-BBEE-4030-A832-D5FC81D4B680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07D340EC-BBEE-4030-A832-D5FC81D4B680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07D340EC-BBEE-4030-A832-D5FC81D4B680}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0B448F88-7D23-48F0-86D3-B59AE98F1CF0}
+	EndGlobalSection
+EndGlobal
