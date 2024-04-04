@@ -1,14 +1,10 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using Markdig;
 
 namespace ShareAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/{guid?}")] // Make GUID optional at the controller level
     public class SharingController : ControllerBase
     {
 
@@ -23,29 +19,29 @@ namespace ShareAPI.Controllers
         public async Task<IActionResult> UploadMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files)
         {
             // Generate a new GUID
-            var guid = Guid.NewGuid().ToString();
+            string identifier = Guid.NewGuid().ToString();
 
             // Create a directory with the GUID as its name
-            var directoryPath = Path.Combine("YourBaseDirectory", guid);
+            string directoryPath = Path.Combine("YourBaseDirectory", identifier);
             Directory.CreateDirectory(directoryPath);
 
             // Save the markdown content to a file within this directory
-            var markdownFilePath = Path.Combine(directoryPath, "content.md");
+            string markdownFilePath = Path.Combine(directoryPath, "content.md");
             await System.IO.File.WriteAllTextAsync(markdownFilePath, markdown);
 
             _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
 
             long totalBytes = 0;
-            foreach (var file in files)
+            foreach (IFormFile file in files)
             {
                 // Log the file name
                 _logger.LogInformation($"Received file: {file.FileName}");
 
                 // Save each file in the directory
-                var filePath = Path.Combine(directoryPath, file.FileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                string filePath = Path.Combine(directoryPath, file.FileName);
+                await using (FileStream stream = new(filePath, FileMode.Create))
                 {
-                    await file.CopyToAsync(stream);
+                    await file.CopyToAsync(stream).ConfigureAwait(false);
                 }
 
                 totalBytes += file.Length;
@@ -54,7 +50,30 @@ namespace ShareAPI.Controllers
             _logger.LogInformation($"Total bytes received: {totalBytes}");
 
             // Return a response indicating success
-            return Ok(new { Message = "Markdown and files uploaded successfully.", Guid = guid });
+            return Ok(new { Message = "Markdown and files uploaded successfully.", Guid = identifier });
+        }
+
+        [HttpGet("")]
+        public IActionResult GetMarkdownContent(string guid)
+        {
+            // Construct the path to the markdown file using the provided GUID
+            string markdownFilePath = Path.Combine("YourBaseDirectory", guid, "content.md");
+
+            // Check if the file exists
+            if (!System.IO.File.Exists(markdownFilePath))
+            {
+                // If the file does not exist, return a 404 Not Found response
+                return NotFound(new { Message = "Markdown file not found." });
+            }
+
+            // Read the content of the markdown file
+            string markdownContent = System.IO.File.ReadAllText(markdownFilePath);
+
+            // Convert markdown string to HTML
+            string htmlContent = Markdown.ToHtml(markdownContent);
+
+            // Return the content of the markdown file
+            return Ok(new { Content = htmlContent });
         }
     }
 }
