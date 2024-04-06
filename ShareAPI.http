@@ -1,6 +1,10 @@
-@ShareAPI_HostAddress = http://localhost:5213
+@ShareAPI_HostAddress = https://localhost:7288
 
 POST {{ShareAPI_HostAddress}}/sharing/
 Accept: application/json
+
+###
+
+GET {{ShareAPI_HostAddress}}/sharing/string
 
 ###
