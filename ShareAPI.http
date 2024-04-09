@@ -8,3 +8,7 @@ Accept: application/json
 GET {{ShareAPI_HostAddress}}/sharing/string
 
 ###
+
+DELETE {{ShareAPI_HostAddress}}/sharing/string
+
+###
