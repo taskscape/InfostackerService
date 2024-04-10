@@ -1,7 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Markdig;
-using Microsoft.Extensions.Primitives;
 
 namespace ShareAPI.Controllers
 {
@@ -78,20 +77,37 @@ namespace ShareAPI.Controllers
             // Convert markdown string to HTML
             var htmlContent = Markdown.ToHtml(markdownContent);
             var templatePath = "template.html";
+            var scriptTemplatePath = "templateScript.html";
             var htmlTemplate = System.IO.File.ReadAllText(templatePath);
+            var scriptTemplate = System.IO.File.ReadAllText(scriptTemplatePath);
             
             var pdfUrls = Directory.GetFiles(Path.Combine(_rootFolderPath, identifier))
                 .Where(file => Path.GetExtension(file) == ".pdf")
                 .Select(file => Url.Action("GetPdf", "Sharing", new { identifier = identifier, fileName = Path.GetFileName(file) }, Request.Scheme));
-            
+            var scripts = string.Empty;
+            var docs = string.Empty;
             foreach (var pdfUrl in pdfUrls)
             {
-                htmlTemplate = htmlTemplate.Replace("{pdfUrl}", $"\"{pdfUrl}\"");
-                htmlTemplate = htmlTemplate.Replace("{pdfName}", $"\"{Path.GetFileName(pdfUrl)}\"");
-                htmlTemplate = htmlTemplate.Replace("{token}", $"\"{_configuration.GetSection("AdobeAPIToken").Value}\"");
+                scriptTemplate = scriptTemplate.Replace("{pdfUrl}", $"\"{pdfUrl}\"");
+                scriptTemplate = scriptTemplate.Replace("{pdfDivId}", $"{Guid.NewGuid()}");
+                scriptTemplate = scriptTemplate.Replace("{pdfName}", $"\"{Path.GetFileName(pdfUrl)}\"");
+                scriptTemplate = scriptTemplate.Replace("{token}", $"\"{_configuration.GetSection("AdobeAPIToken").Value}\"");
+                scripts += scriptTemplate;
+                scriptTemplate = System.IO.File.ReadAllText(scriptTemplatePath);
             }
-
+            
             htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
+            htmlTemplate = htmlTemplate.Replace("{pdfList}", scripts);
+            
+            var docUrls = Directory.GetFiles(Path.Combine(_rootFolderPath, identifier))
+                .Where(file => Path.GetExtension(file) == ".doc" || Path.GetExtension(file) == ".docx" )
+                .Select(file => Url.Action("GetDoc", "Sharing", new { identifier = identifier, fileName = Path.GetFileName(file) }, Request.Scheme));
+
+            foreach (var docUrl in docUrls)
+            {
+                docs = docUrl;
+            }
+            htmlTemplate = htmlTemplate.Replace("{docs}", docs);
 
             return new ContentResult {
                 ContentType = "text/html",
@@ -167,6 +183,21 @@ namespace ShareAPI.Controllers
             
             var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             return File(stream, "application/pdf");
+        }
+        
+        [HttpGet("Doc/{identifier}/{fileName}")]
+        public IActionResult GetDoc(string identifier, string fileName)
+        {
+
+            string filePath = Path.Combine(_rootFolderPath, identifier, fileName);
+            
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound(new { Message = "Document file not found." });
+            }
+            
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         }
     }
 }
