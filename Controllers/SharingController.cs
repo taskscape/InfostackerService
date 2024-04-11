@@ -1,6 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Markdig;
+using ShareAPI.Services;
 
 namespace ShareAPI.Controllers
 {
@@ -8,196 +8,90 @@ namespace ShareAPI.Controllers
     [Route("[controller]")]
     public class SharingController : ControllerBase
     {
+        private readonly ISharingService _sharingService;
 
-        private readonly ILogger<SharingController> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly string? _rootFolderPath;
-
-        public SharingController(ILogger<SharingController> logger, IConfiguration configuration)
+        public SharingController(ISharingService sharingService)
         {
-            _logger = logger;
-            _configuration = configuration;
-            _rootFolderPath = _configuration.GetSection("RootFolder").Value;
+            _sharingService = sharingService;
         }
         
         [HttpPost("UploadMarkdownWithFiles")]
         public async Task<IActionResult> UploadMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files)
         {
-            // Generate a new GUID
-            var identifier = Guid.NewGuid();
-
-            // Create a directory with the GUID as its name
-            var directoryPath = Path.Combine(_rootFolderPath, identifier.ToString());
-            Directory.CreateDirectory(directoryPath);
-
-            // Save the markdown content to a file within this directory
-            var markdownFilePath = Path.Combine(directoryPath, "content.md");
-            await System.IO.File.WriteAllTextAsync(markdownFilePath, markdown);
-
-            _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
-
-            long totalBytes = 0;
-            foreach (IFormFile file in files)
-            {
-                // Log the file name
-                _logger.LogInformation($"Received file: {file.FileName}");
-
-                // Save each file in the directory
-                var filePath = Path.Combine(directoryPath, file.FileName);
-                await using (FileStream stream = new(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream).ConfigureAwait(false);
-                }
-
-                totalBytes += file.Length;
-            }
-
-            _logger.LogInformation($"Total bytes received: {totalBytes}");
-
-            // Return a response indicating success
+            Guid identifier = await _sharingService.UploadMarkdownWithFiles(markdown, files);
             return Ok(new { Message = "Markdown and files uploaded successfully.", Guid = identifier });
         }
 
         [HttpGet("{identifier}")]
-        public IActionResult GetMarkdownContent(string identifier)
+        public async Task<IActionResult> GetMarkdownContent(string identifier)
         {
-            // Construct the path to the markdown file using the provided GUID
-            string markdownFilePath = Path.Combine(_rootFolderPath, identifier, "content.md");
-
-            // Check if the file exists
-            if (!System.IO.File.Exists(markdownFilePath))
+            string? result = await _sharingService.GetMarkdownContent(identifier);
+            if (result is null)
             {
-                // If the file does not exist, return a 404 Not Found response
-                return NotFound(new { Message = "Markdown file not found." });
+                return NotFound(new { Message = "No markdown or files with given identifier found.", Guid = identifier });
             }
-
-            // Read the content of the markdown file
-            var markdownContent = System.IO.File.ReadAllText(markdownFilePath);
-
-            // Convert markdown string to HTML
-            var htmlContent = Markdown.ToHtml(markdownContent);
-            var templatePath = "template.html";
-            var scriptTemplatePath = "templateScript.html";
-            var htmlTemplate = System.IO.File.ReadAllText(templatePath);
-            var scriptTemplate = System.IO.File.ReadAllText(scriptTemplatePath);
-            
-            var pdfUrls = Directory.GetFiles(Path.Combine(_rootFolderPath, identifier))
-                .Where(file => Path.GetExtension(file) == ".pdf")
-                .Select(file => Url.Action("GetPdf", "Sharing", new { identifier = identifier, fileName = Path.GetFileName(file) }, Request.Scheme));
-            var scripts = string.Empty;
-            var docs = string.Empty;
-            foreach (var pdfUrl in pdfUrls)
-            {
-                scriptTemplate = scriptTemplate.Replace("{pdfUrl}", $"\"{pdfUrl}\"");
-                scriptTemplate = scriptTemplate.Replace("{pdfDivId}", $"{Guid.NewGuid()}");
-                scriptTemplate = scriptTemplate.Replace("{pdfName}", $"\"{Path.GetFileName(pdfUrl)}\"");
-                scriptTemplate = scriptTemplate.Replace("{token}", $"\"{_configuration.GetSection("AdobeAPIToken").Value}\"");
-                scripts += scriptTemplate;
-                scriptTemplate = System.IO.File.ReadAllText(scriptTemplatePath);
-            }
-            
-            htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
-            htmlTemplate = htmlTemplate.Replace("{pdfList}", scripts);
-            
-            var docUrls = Directory.GetFiles(Path.Combine(_rootFolderPath, identifier))
-                .Where(file => Path.GetExtension(file) == ".doc" || Path.GetExtension(file) == ".docx" )
-                .Select(file => Url.Action("GetDoc", "Sharing", new { identifier = identifier, fileName = Path.GetFileName(file) }, Request.Scheme));
-
-            foreach (var docUrl in docUrls)
-            {
-                docs = docUrl;
-            }
-            htmlTemplate = htmlTemplate.Replace("{docs}", docs);
 
             return new ContentResult {
                 ContentType = "text/html",
                 StatusCode = (int)HttpStatusCode.OK,
-                Content = htmlTemplate
+                Content = result
             };
         }
         
         [HttpPut("{identifier}")]
         public async Task<IActionResult> UpdateMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files, Guid identifier)
         {
-            // Create a directory with the GUID as its name
-            var directoryPath = Path.Combine(_rootFolderPath, identifier.ToString());
-            if (!Directory.Exists(directoryPath))
+            if (!await _sharingService.UpdateMarkdownWithFiles(markdown, files, identifier))
             {
                 return NotFound(new { Message = "No markdown or files with given identifier found.", Guid = identifier });
             }
-            Directory.Delete(directoryPath, true);
-            Directory.CreateDirectory(directoryPath);
             
-            // Save the markdown content to a file within this directory
-            var markdownFilePath = Path.Combine(directoryPath, "content.md");
-            await System.IO.File.WriteAllTextAsync(markdownFilePath, markdown);
-
-            _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
-
-            long totalBytes = 0;
-            foreach (IFormFile file in files)
-            {
-                // Log the file name
-                _logger.LogInformation($"Received file: {file.FileName}");
-
-                // Save each file in the directory
-                var filePath = Path.Combine(directoryPath, file.FileName);
-                await using (FileStream stream = new(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream).ConfigureAwait(false);
-                }
-
-                totalBytes += file.Length;
-            }
-
-            _logger.LogInformation($"Total bytes received: {totalBytes}");
-
-            // Return a response indicating success
             return Ok(new { Message = "Markdown and files updated successfully.", Guid = identifier });
         }
         
         [HttpDelete("{identifier}")]
-        public IActionResult DeleteMarkdownWithFiles(string identifier)
+        public async Task<IActionResult> DeleteMarkdownWithFiles(string identifier)
         {
-            var directoryPath = Path.Combine(_rootFolderPath, identifier);
 
-            if (!Directory.Exists(directoryPath))
+            if (!await _sharingService.DeleteMarkdownWithFiles(identifier))
             {
                 return NotFound(new { Message = "No markdown or files with given identifier found.", Guid = identifier });
             }
 
-            Directory.Move(directoryPath, directoryPath + "-deleted");
             return Ok(new { Message = "Markdown and files successfully deleted.", Guid = identifier });
         }
         
         [HttpGet("Pdf/{identifier}/{fileName}")]
-        public IActionResult GetPdf(string identifier, string fileName)
+        public async Task<IActionResult> GetPdf(string identifier, string fileName)
         {
-
-            string filePath = Path.Combine(_rootFolderPath, identifier, fileName);
-            
-            if (!System.IO.File.Exists(filePath))
+            FileStream stream = await _sharingService.GetPdf(identifier, fileName);
+            if (stream is null)
             {
-                return NotFound(new { Message = "PDF file not found." });
+                return NotFound(new { Message = "PDF does not exist.", Guid = identifier });
             }
-            
-            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             return File(stream, "application/pdf");
         }
         
         [HttpGet("Doc/{identifier}/{fileName}")]
-        public IActionResult GetDoc(string identifier, string fileName)
+        public async Task<IActionResult> GetDoc(string identifier, string fileName)
         {
-
-            string filePath = Path.Combine(_rootFolderPath, identifier, fileName);
-            
-            if (!System.IO.File.Exists(filePath))
+            FileStream stream = await _sharingService.GetDoc(identifier, fileName);
+            if (stream is null)
             {
-                return NotFound(new { Message = "Document file not found." });
+                return NotFound(new { Message = "Doc does not exist.", Guid = identifier });
             }
-            
-            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        }
+        
+        [HttpGet("Image/{identifier}/{fileName}")]
+        public async Task<IActionResult> GetImage(string identifier, string fileName)
+        {
+            FileStream stream = await _sharingService.GetImage(identifier, fileName);
+            if (stream is null)
+            {
+                return NotFound(new { Message = "Image does not exist.", Guid = identifier });
+            }
+            return File(stream, "image/png");
         }
     }
 }
