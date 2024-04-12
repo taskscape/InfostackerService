@@ -8,9 +8,9 @@ public class SharingService : ISharingService
     private readonly IConfiguration _configuration;
     private readonly LinkGenerator _linkGenerator;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly string? _rootFolderPath;
-    private readonly string? _templatePath;
-    private readonly string? _templateScriptPath;
+    public required string? NotesFolderPath;
+    public required string? TemplatePath;
+    public required string? TemplateScriptPath;
 
     public SharingService(ILogger<SharingService> logger, IConfiguration configuration, LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor)
     {
@@ -18,9 +18,9 @@ public class SharingService : ISharingService
         _configuration = configuration;
         _linkGenerator = linkGenerator;
         _httpContextAccessor = httpContextAccessor;
-        _rootFolderPath = _configuration.GetSection("RootFolder").Value;
-        _templatePath = _configuration.GetSection("TemplatePath").Value;
-        _templateScriptPath = _configuration.GetSection("TemplateScriptPath").Value;
+        NotesFolderPath = _configuration.GetSection("NotesFolder").Value ?? string.Empty;
+        TemplatePath = _configuration.GetSection("TemplatePath").Value ?? string.Empty;
+        TemplateScriptPath = _configuration.GetSection("TemplateScriptPath").Value ?? string.Empty;
     }
 
     public async Task<Guid> UploadMarkdownWithFiles(string markdown, List<IFormFile> files)
@@ -28,11 +28,19 @@ public class SharingService : ISharingService
         var identifier = Guid.NewGuid();
 
         // Create a directory with the GUID as its name
-        var directoryPath = Path.Combine(_rootFolderPath, identifier.ToString());
-        Directory.CreateDirectory(directoryPath);
-
+        string directoryPath = Path.Combine(NotesFolderPath, identifier.ToString());
+        try
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Error creating directory: {e}");
+            return Guid.Empty;
+        }
+        
         // Save the markdown content to a file within this directory
-        var markdownFilePath = Path.Combine(directoryPath, "content.md");
+        string markdownFilePath = Path.Combine(directoryPath, "content.md");
         await File.WriteAllTextAsync(markdownFilePath, markdown);
 
         _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
@@ -60,7 +68,7 @@ public class SharingService : ISharingService
     public Task<string> GetMarkdownContent(string identifier)
     {
         // Construct the path to the markdown file using the provided GUID
-        string markdownFilePath = Path.Combine(_rootFolderPath, identifier, "content.md");
+        string markdownFilePath = Path.Combine(NotesFolderPath, identifier, "content.md");
 
         // Check if the file exists
         if (!File.Exists(markdownFilePath))
@@ -69,36 +77,36 @@ public class SharingService : ISharingService
         }
 
         // Read the content of the markdown file
-        var markdownContent = File.ReadAllText(markdownFilePath);
+        string markdownContent = File.ReadAllText(markdownFilePath);
 
         // Convert markdown string to HTML
-        var htmlContent = Markdown.ToHtml(markdownContent);
+        string htmlContent = Markdown.ToHtml(markdownContent);
         
         // Reading templates
-        var templatePath = _templatePath;
-        var scriptTemplatePath = _templateScriptPath;
-        var htmlTemplate = File.ReadAllText(templatePath);
-        var scriptTemplate = File.ReadAllText(scriptTemplatePath);
+        string? templatePath = TemplatePath;
+        string? scriptTemplatePath = TemplateScriptPath;
+        string htmlTemplate = File.ReadAllText(templatePath);
+        string scriptTemplate = File.ReadAllText(scriptTemplatePath);
         
         // Inserting markdown content into html
         htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
         
         // Getting PDFs
-        var pdfFiles = Directory.GetFiles(Path.Combine(_rootFolderPath, identifier))
+        var pdfFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => Path.GetExtension(file) == ".pdf");
         
         var pdfUrls = pdfFiles.Select(file =>
         {
-            var fileName = Path.GetFileName(file);
-            var url = _linkGenerator.GetPathByAction("GetPdf", "Sharing", new { identifier, fileName });
-            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            string fileName = Path.GetFileName(file);
+            string? url = _linkGenerator.GetPathByAction("GetPdf", "Sharing", new { identifier, fileName });
+            string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
         });
         
         var scripts = string.Empty;
         // Adding PDFs to script
-        foreach (var pdfUrl in pdfUrls)
+        foreach (string pdfUrl in pdfUrls)
         {
             scriptTemplate = scriptTemplate.Replace("{pdfUrl}", $"\"{pdfUrl}\"");
             scriptTemplate = scriptTemplate.Replace("{pdfDivId}", $"{Guid.NewGuid()}");
@@ -113,7 +121,7 @@ public class SharingService : ISharingService
         
         // Getting docs
         var docs = string.Empty;
-        var docFiles = Directory.GetFiles(Path.Combine(_rootFolderPath, identifier))
+        var docFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => Path.GetExtension(file) == ".doc" || Path.GetExtension(file) == ".docx");
         
         var docUrls = docFiles.Select(file =>
@@ -126,9 +134,9 @@ public class SharingService : ISharingService
         });
 
         // Adding iframes for each doc
-        foreach (var docUrl in docUrls)
+        foreach (string docUrl in docUrls)
         {
-            docs += $"<iframe src=\"https://docs.google.com/viewer?url={docUrl}&embedded=true\" style=\"width: 800px; height:1400px;\"></iframe>\n";
+            docs += $"<iframe src=\"https://docs.google.com/viewer?url={docUrl}&embedded=true\"></iframe>\n";
         }
         
         // Inserting the iframes into html
@@ -141,21 +149,21 @@ public class SharingService : ISharingService
             ".jpeg",
             ".png"
         };
-        var imageFiles = Directory.GetFiles(Path.Combine(_rootFolderPath, identifier))
+        var imageFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => acceptedFormats.Contains(Path.GetExtension(file)));
 
         var imagePaths = imageFiles.Select(file =>
         {
-            var fileName = Path.GetFileName(file);
-            var url = _linkGenerator.GetPathByAction("GetImage", "Sharing", new { identifier, fileName });
-            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            string fileName = Path.GetFileName(file);
+            string? url = _linkGenerator.GetPathByAction("GetImage", "Sharing", new { identifier, fileName });
+            string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
         });
 
-        foreach (var image in imagePaths)
+        foreach (string imagePath in imagePaths)
         {
-            images += $"<img src={image}>\n";
+            images += $"<img src={imagePath}>\n";
         }
         htmlTemplate = htmlTemplate.Replace("{images}", images);
         return Task.FromResult(htmlTemplate);
@@ -164,7 +172,7 @@ public class SharingService : ISharingService
     public async Task<bool> UpdateMarkdownWithFiles(string markdown, List<IFormFile> files, Guid identifier)
     {
         // Create a directory with the GUID as its name
-        var directoryPath = Path.Combine(_rootFolderPath, identifier.ToString());
+        string directoryPath = Path.Combine(NotesFolderPath, identifier.ToString());
         if (!Directory.Exists(directoryPath))
         {
             return false;
@@ -173,7 +181,7 @@ public class SharingService : ISharingService
         Directory.CreateDirectory(directoryPath);
             
         // Save the markdown content to a file within this directory
-        var markdownFilePath = Path.Combine(directoryPath, "content.md");
+        string markdownFilePath = Path.Combine(directoryPath, "content.md");
         await File.WriteAllTextAsync(markdownFilePath, markdown);
 
         _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
@@ -185,7 +193,7 @@ public class SharingService : ISharingService
             _logger.LogInformation($"Received file: {file.FileName}");
 
             // Save each file in the directory
-            var filePath = Path.Combine(directoryPath, file.FileName);
+            string filePath = Path.Combine(directoryPath, file.FileName);
             await using (FileStream stream = new(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream).ConfigureAwait(false);
@@ -200,7 +208,7 @@ public class SharingService : ISharingService
 
     public Task<bool> DeleteMarkdownWithFiles(string identifier)
     {
-        var directoryPath = Path.Combine(_rootFolderPath, identifier);
+        string directoryPath = Path.Combine(NotesFolderPath, identifier);
 
         if (!Directory.Exists(directoryPath))
         {
@@ -213,21 +221,21 @@ public class SharingService : ISharingService
 
     public Task<FileStream> GetPdf(string identifier, string fileName)
     {
-        var filePath = Path.Combine(_rootFolderPath, identifier, fileName);
+        string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
             
         return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
     }
 
     public Task<FileStream> GetDoc(string identifier, string fileName)
     {
-        var filePath = Path.Combine(_rootFolderPath, identifier, fileName);
+        string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
             
         return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
     }
 
     public Task<FileStream> GetImage(string identifier, string fileName)
     {
-        var filePath = Path.Combine(_rootFolderPath, identifier, fileName);
+        string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
             
         return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
     }

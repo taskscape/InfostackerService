@@ -3,11 +3,58 @@
 <head>
     <title>Note</title>
     <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
+    <style>
+        body {
+            text-align: center;
+        }
+        .content {
+            display: inline-block;
+            text-align: left;
+            width: 80%;
+        }
+        .pdf-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            height: 60%;
+        }
+        .pdf-container-item {
+            width: 30vw; 
+            height: 50vw;
+            margin: 1%;
+        }
+        .docs-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            height: 60%;
+        }
+        .docs-container iframe {
+            width: 30vw;
+            height: 90vh;
+            margin: 1%;
+        }
+        .image-container img {
+            width: 80%;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
+<div class="content">
     {markdown}
+</div>
+
+<div class="pdf-container">
     {pdfList}
+</div>
+
+<div class="docs-container">
     {docs}
+</div>
+
+<div class="image-container">
     {images}
+</div>
 </body>
 </html>
