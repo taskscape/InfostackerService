@@ -21,10 +21,10 @@ namespace ShareAPI.Controllers
             Guid identifier = await _sharingService.UploadMarkdownWithFiles(markdown, files);
             if (identifier == Guid.Empty)
             {
-                BadRequest(new { Message = "There was an error while processing the request.", Guid = identifier });
+                BadRequest(new { Message = "There was an error while processing the request.", id = identifier });
             }
 
-            return Ok(new { Message = "Markdown and files uploaded successfully.", Guid = identifier });
+            return Ok(new { Message = "Markdown and files uploaded successfully.", id = identifier });
         }
 
         [HttpGet("{identifier}")]
@@ -33,7 +33,7 @@ namespace ShareAPI.Controllers
             string? result = await _sharingService.GetMarkdownContent(identifier);
             if (result is null)
             {
-                return NotFound(new { Message = "No markdown or files with given identifier found.", Guid = identifier });
+                return NotFound(new { Message = "No markdown or files with given identifier found.", id = identifier });
             }
 
             return new ContentResult {
@@ -48,10 +48,10 @@ namespace ShareAPI.Controllers
         {
             if (!await _sharingService.UpdateMarkdownWithFiles(markdown, files, identifier))
             {
-                return NotFound(new { Message = "No markdown or files with given identifier found.", Guid = identifier });
+                return NotFound(new { Message = "No markdown or files with given identifier found.", id = identifier });
             }
             
-            return Ok(new { Message = "Markdown and files updated successfully.", Guid = identifier });
+            return Ok(new { Message = "Markdown and files updated successfully.", id = identifier });
         }
         
         [HttpDelete("{identifier}")]
@@ -60,10 +60,10 @@ namespace ShareAPI.Controllers
 
             if (!await _sharingService.DeleteMarkdownWithFiles(identifier))
             {
-                return NotFound(new { Message = "No markdown or files with given identifier found.", Guid = identifier });
+                return NotFound(new { Message = "No markdown or files with given identifier found.", id = identifier });
             }
 
-            return Ok(new { Message = "Markdown and files successfully deleted.", Guid = identifier });
+            return Ok(new { Message = "Markdown and files successfully deleted.", id = identifier });
         }
         
         [HttpGet("Pdf/{identifier}/{fileName}")]
@@ -72,7 +72,7 @@ namespace ShareAPI.Controllers
             FileStream stream = await _sharingService.GetPdf(identifier, fileName);
             if (stream is null)
             {
-                return NotFound(new { Message = "PDF does not exist.", Guid = identifier });
+                return NotFound(new { Message = "PDF does not exist.", id = identifier });
             }
             return File(stream, "application/pdf");
         }
@@ -83,7 +83,7 @@ namespace ShareAPI.Controllers
             FileStream stream = await _sharingService.GetDoc(identifier, fileName);
             if (stream is null)
             {
-                return NotFound(new { Message = "Doc does not exist.", Guid = identifier });
+                return NotFound(new { Message = "Doc does not exist.", id = identifier });
             }
             return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         }
@@ -94,7 +94,7 @@ namespace ShareAPI.Controllers
             FileStream stream = await _sharingService.GetImage(identifier, fileName);
             if (stream is null)
             {
-                return NotFound(new { Message = "Image does not exist.", Guid = identifier });
+                return NotFound(new { Message = "Image does not exist.", id = identifier });
             }
             return File(stream, "image/png");
         }
