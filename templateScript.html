@@ -1,0 +1,24 @@
+<div id="adobe-dc-view-{pdfDivId}" class="pdf-container-item"></div>
+<script type="text/javascript">
+    document.addEventListener("adobe_dc_view_sdk.ready", function()
+    {
+        var adobeDCView = new AdobeDC.View({
+            clientId: {token},
+            divId: "adobe-dc-view-{pdfDivId}"
+        });
+        adobeDCView.previewFile({
+            content: {
+                location: {
+                    url: {pdfUrl},
+                }
+            },
+            metaData: {
+                fileName: {pdfName}
+            }
+        }, {
+            embedMode: "SIZED_CONTAINER",
+            showDownloadPDF: true,
+            showPrintPDF: true
+        });
+    });
+</script>
