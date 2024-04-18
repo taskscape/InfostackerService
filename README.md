@@ -28,4 +28,60 @@
 5. Press "Finish", and then "Close".
 6. Now, press "Publish" next to the generated publish profile.
 
+## Adding CORS Headers to IIS Web.config
+
+To enable CORS (Cross-Origin Resource Sharing) on an IIS server, you can add CORS headers to the web.config file of your website or application. This allows the server to specify which origins are permitted to access its resources.
+
+### Steps:
+
+1. **Access web.config**: Locate and access the `web.config` file for your website or application. This file is typically located in the root directory of your application.
+
+2. **Edit web.config**: Open the `web.config` file using a text editor.
+
+3. **Add CORS Configuration**: Inside the `<system.webServer>` section of the `web.config` file, add the following XML configuration to enable CORS and specify the desired CORS headers. Example:
+
+    ```xml
+    <system.webServer>
+        <cors enabled="true" failUnlistedOrigins="true">
+            <add origin="*" />
+            <add origin="RequestFromSpecifiedWebsite"
+                 allowCredentials="true"
+                 maxAge="120"> 
+                <allowHeaders allowAllRequestedHeaders="true">
+                    <add header="header1" />
+                    <add header="header2" />
+                </allowHeaders>
+                <allowMethods>
+                    <add method="GET" />
+                    <add method="POST" />
+                    <add method="PUT" />
+                    <add method="DELETE" />
+                </allowMethods>
+                <exposeHeaders>
+                    <add header="header1" />
+                    <add header="header2" />
+                </exposeHeaders>
+            </add>
+            <add origin="http://*" allowed="false" />
+        </cors>
+    </system.webServer>
+    ```
+
+    In the above example:
+    - `enabled="true"` enables CORS support.
+    - `failUnlistedOrigins="true"` specifies that requests from origins not listed in the configuration should fail.
+    - `<add origin="*">` allows requests from any origin.
+    - `<allowMethods>` specifies the allowed HTTP methods (GET, POST, PUT, DELETE).
+    - '*' `<allowHeaders>` specifies the allowed request headers.
+    - '*' `<exposeHeaders>` specifies the headers that the server exposes to the client.
+
+    <sub><sup>'*' - optional tags</sup></sub>
+
+4. **Save Changes**: After adding the CORS configuration to the `web.config` file, save the changes.
+
+5. **Restart IIS**: To apply the changes, restart the IIS server. You can do this by selecting the server node in the IIS Manager and clicking "Restart" under the Manage Server section.
+
+Once these steps are completed, the IIS server will include the specified CORS headers in its responses, allowing cross-origin requests for the specified HTTP methods.
+
+
 API server should now be correctly set up.
