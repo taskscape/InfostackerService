@@ -32,7 +32,13 @@
 
 To enable CORS (Cross-Origin Resource Sharing) on an IIS server, you can add CORS headers to the web.config file of your website or application. This allows the server to specify which origins are permitted to access its resources.
 
+
+### Prerequisites
+
+- IIS CORS Module installed: [Instalation link](https://www.iis.net/downloads/microsoft/iis-cors-module) 
+
 ### Steps:
+
 
 1. **Access web.config**: Locate and access the `web.config` file for your website or application. This file is typically located in the root directory of your application.
 
