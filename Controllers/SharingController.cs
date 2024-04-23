@@ -16,6 +16,7 @@ namespace ShareAPI.Controllers
         }
         
         [HttpPost("UploadMarkdownWithFiles")]
+        [RateLimit(100, 86400)]
         public async Task<IActionResult> UploadMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files)
         {
             Guid identifier = await _sharingService.UploadMarkdownWithFiles(markdown, files);
