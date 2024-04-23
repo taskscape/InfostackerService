@@ -83,4 +83,9 @@ To enable CORS (Cross-Origin Resource Sharing) on an IIS server, you can add COR
 
 Once these steps are completed, the IIS server will include the specified CORS headers in its responses, allowing cross-origin requests for the specified HTTP methods.
 
+## Sample Publish
+
+In the repository, there is an already published current version of the API with sample notes folder set up (PublishedSampleAPI.zip). 
+Unpack it into your site's location and modify `appsettings.json` and `web.config` according to your needs.
+
 API server should now be correctly set up.
