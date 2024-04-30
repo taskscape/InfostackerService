@@ -39,29 +39,7 @@ public class SharingService : ISharingService
             return Guid.Empty;
         }
         
-        // Save the markdown content to a file within this directory
-        string markdownFilePath = Path.Combine(directoryPath, "content.md");
-        await File.WriteAllTextAsync(markdownFilePath, markdown);
-
-        _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
-
-        long totalBytes = 0;
-        foreach (IFormFile file in files)
-        {
-            // Log the file name
-            _logger.LogInformation($"Received file: {file.FileName}");
-
-            // Save each file in the directory
-            var filePath = Path.Combine(directoryPath, file.FileName);
-            await using (FileStream stream = new(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream).ConfigureAwait(false);
-            }
-
-            totalBytes += file.Length;
-        }
-
-        _logger.LogInformation($"Total bytes received: {totalBytes}");
+        await SaveFiles(markdown, files, directoryPath);
         return identifier;
     }
 
@@ -92,10 +70,10 @@ public class SharingService : ISharingService
         htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
         
         // Getting PDFs
-        var pdfFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
+        IEnumerable<string> pdfFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => Path.GetExtension(file) == ".pdf");
         
-        var pdfUrls = pdfFiles.Select(file =>
+        IEnumerable<string> pdfUrls = pdfFiles.Select(file =>
         {
             string fileName = Path.GetFileName(file);
             string? url = _linkGenerator.GetPathByAction("GetPdf", "Sharing", new { identifier, fileName });
@@ -121,14 +99,14 @@ public class SharingService : ISharingService
         
         // Getting docs
         var docs = string.Empty;
-        var docFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
+        IEnumerable<string> docFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => Path.GetExtension(file) == ".doc" || Path.GetExtension(file) == ".docx");
         
-        var docUrls = docFiles.Select(file =>
+        IEnumerable<string> docUrls = docFiles.Select(file =>
         {
-            var fileName = Path.GetFileName(file);
-            var url = _linkGenerator.GetPathByAction("GetDoc", "Sharing", new { identifier, fileName });
-            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            string fileName = Path.GetFileName(file);
+            string? url = _linkGenerator.GetPathByAction("GetDoc", "Sharing", new { identifier, fileName });
+            string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
         });
@@ -149,10 +127,10 @@ public class SharingService : ISharingService
             ".jpeg",
             ".png"
         };
-        var imageFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
+        IEnumerable<string> imageFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => acceptedFormats.Contains(Path.GetExtension(file)));
 
-        var imagePaths = imageFiles.Select(file =>
+        IEnumerable<string> imagePaths = imageFiles.Select(file =>
         {
             string fileName = Path.GetFileName(file);
             string? url = _linkGenerator.GetPathByAction("GetImage", "Sharing", new { identifier, fileName });
@@ -179,30 +157,8 @@ public class SharingService : ISharingService
         }
         Directory.Delete(directoryPath, true);
         Directory.CreateDirectory(directoryPath);
-            
-        // Save the markdown content to a file within this directory
-        string markdownFilePath = Path.Combine(directoryPath, "content.md");
-        await File.WriteAllTextAsync(markdownFilePath, markdown);
-
-        _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
-
-        long totalBytes = 0;
-        foreach (IFormFile file in files)
-        {
-            // Log the file name
-            _logger.LogInformation($"Received file: {file.FileName}");
-
-            // Save each file in the directory
-            string filePath = Path.Combine(directoryPath, file.FileName);
-            await using (FileStream stream = new(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream).ConfigureAwait(false);
-            }
-
-            totalBytes += file.Length;
-        }
-
-        _logger.LogInformation($"Total bytes received: {totalBytes}");
+        
+        await SaveFiles(markdown, files, directoryPath);
         return true;
     }
 
@@ -238,5 +194,35 @@ public class SharingService : ISharingService
         string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
             
         return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
+    }
+
+    private async Task SaveFiles(string markdown, List<IFormFile> files, string directoryPath)
+    {
+        // Save the markdown content to a file within this directory
+        string markdownFilePath = Path.Combine(directoryPath, "content.md");
+        await File.WriteAllTextAsync(markdownFilePath, markdown);
+
+        _logger.LogInformation($"Markdown saved to: {markdownFilePath}");
+
+        long totalBytes = 0;
+        foreach (IFormFile file in files)
+        {
+            // Log the file name
+            _logger.LogInformation($"Received file: {file.FileName}");
+
+            // Save each file in the directory
+            var random = new Random();
+            var uniqueFileName = $"{random.Next():x}-{file.FileName}";
+            string filePath = Path.Combine(directoryPath, uniqueFileName);
+            
+            await using (FileStream stream = new(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream).ConfigureAwait(false);
+            }
+
+            totalBytes += file.Length;
+        }
+
+        _logger.LogInformation($"Total bytes received: {totalBytes}");
     }
 }
