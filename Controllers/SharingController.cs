@@ -14,7 +14,7 @@ namespace ShareAPI.Controllers
         {
             _sharingService = sharingService;
         }
-        
+
         [HttpPost("UploadMarkdownWithFiles")]
         [RateLimit(100, 86400)]
         public async Task<IActionResult> UploadMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files)
@@ -43,7 +43,7 @@ namespace ShareAPI.Controllers
                 Content = result
             };
         }
-        
+
         [HttpPut("{identifier}")]
         public async Task<IActionResult> UpdateMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files, Guid identifier)
         {
@@ -51,10 +51,10 @@ namespace ShareAPI.Controllers
             {
                 return NotFound(new { Message = "No markdown or files with given identifier found.", id = identifier });
             }
-            
+
             return Ok(new { Message = "Markdown and files updated successfully.", id = identifier });
         }
-        
+
         [HttpDelete("{identifier}")]
         public async Task<IActionResult> DeleteMarkdownWithFiles(string identifier)
         {
@@ -66,7 +66,7 @@ namespace ShareAPI.Controllers
 
             return Ok(new { Message = "Markdown and files successfully deleted.", id = identifier });
         }
-        
+
         [HttpGet("Pdf/{identifier}/{fileName}")]
         public async Task<IActionResult> GetPdf(string identifier, string fileName)
         {
@@ -77,7 +77,7 @@ namespace ShareAPI.Controllers
             }
             return File(stream, "application/pdf");
         }
-        
+
         [HttpGet("Doc/{identifier}/{fileName}")]
         public async Task<IActionResult> GetDoc(string identifier, string fileName)
         {
@@ -88,7 +88,7 @@ namespace ShareAPI.Controllers
             }
             return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         }
-        
+
         [HttpGet("Image/{identifier}/{fileName}")]
         public async Task<IActionResult> GetImage(string identifier, string fileName)
         {

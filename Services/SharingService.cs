@@ -38,7 +38,7 @@ public class SharingService : ISharingService
             _logger.LogError($"Error creating directory: {e}");
             return Guid.Empty;
         }
-        
+
         await SaveFiles(markdown, files, directoryPath);
         return identifier;
     }
@@ -59,20 +59,20 @@ public class SharingService : ISharingService
 
         // Convert markdown string to HTML
         string htmlContent = Markdown.ToHtml(markdownContent);
-        
+
         // Reading templates
         string? templatePath = TemplatePath;
         string? scriptTemplatePath = TemplateScriptPath;
         string htmlTemplate = File.ReadAllText(templatePath);
         string scriptTemplate = File.ReadAllText(scriptTemplatePath);
-        
+
         // Inserting markdown content into html
         htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
-        
+
         // Getting PDFs
         IEnumerable<string> pdfFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => Path.GetExtension(file) == ".pdf");
-        
+
         IEnumerable<string> pdfUrls = pdfFiles.Select(file =>
         {
             string fileName = Path.GetFileName(file);
@@ -81,7 +81,7 @@ public class SharingService : ISharingService
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
         });
-        
+
         var scripts = string.Empty;
         // Adding PDFs to script
         foreach (string pdfUrl in pdfUrls)
@@ -93,15 +93,15 @@ public class SharingService : ISharingService
             scripts += scriptTemplate;
             scriptTemplate = File.ReadAllText(scriptTemplatePath);
         }
-        
+
         // Inserting PDFs into html
         htmlTemplate = htmlTemplate.Replace("{pdfList}", scripts);
-        
+
         // Getting docs
         var docs = string.Empty;
         IEnumerable<string> docFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => Path.GetExtension(file) == ".doc" || Path.GetExtension(file) == ".docx");
-        
+
         IEnumerable<string> docUrls = docFiles.Select(file =>
         {
             string fileName = Path.GetFileName(file);
@@ -116,10 +116,10 @@ public class SharingService : ISharingService
         {
             docs += $"<iframe src=\"https://docs.google.com/viewer?url={docUrl}&embedded=true\"></iframe>\n";
         }
-        
+
         // Inserting the iframes into html
         htmlTemplate = htmlTemplate.Replace("{docs}", docs);
-        
+
         var images = string.Empty;
         var acceptedFormats = new List<string>
         {
@@ -157,7 +157,7 @@ public class SharingService : ISharingService
         }
         Directory.Delete(directoryPath, true);
         Directory.CreateDirectory(directoryPath);
-        
+
         await SaveFiles(markdown, files, directoryPath);
         return true;
     }
@@ -178,21 +178,21 @@ public class SharingService : ISharingService
     public Task<FileStream> GetPdf(string identifier, string fileName)
     {
         string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
-            
+
         return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
     }
 
     public Task<FileStream> GetDoc(string identifier, string fileName)
     {
         string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
-            
+
         return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
     }
 
     public Task<FileStream> GetImage(string identifier, string fileName)
     {
         string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
-            
+
         return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
     }
 
@@ -214,7 +214,7 @@ public class SharingService : ISharingService
             var random = new Random();
             var uniqueFileName = $"{random.Next():x}-{file.FileName}";
             string filePath = Path.Combine(directoryPath, uniqueFileName);
-            
+
             await using (FileStream stream = new(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream).ConfigureAwait(false);
