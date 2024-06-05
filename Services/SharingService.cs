@@ -1,3 +1,4 @@
+using System.Buffers.Text;
 using Markdig;
 
 namespace ShareAPI.Services;
@@ -218,11 +219,24 @@ public class SharingService : ISharingService
             await using (FileStream stream = new(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream).ConfigureAwait(false);
+                
+            }
+            string fileContent = await File.ReadAllTextAsync(filePath);
+            if (IsBase64String(fileContent))
+            {
+                byte[] binary = Convert.FromBase64String(fileContent);
+                await File.WriteAllBytesAsync(filePath, binary);
             }
 
             totalBytes += file.Length;
         }
 
         _logger.LogInformation($"Total bytes received: {totalBytes}");
+    }
+    
+    private static bool IsBase64String(string base64)
+    {
+        var buffer = new Span<byte>(new byte[base64.Length]);
+        return Convert.TryFromBase64String(base64, buffer , out int _);
     }
 }
