@@ -85,7 +85,7 @@ Once these steps are completed, the IIS server will include the specified CORS h
 
 ## Sample Publish
 
-In the repository, there is an already published current version of the API with sample notes folder set up (PublishedSampleAPI.zip). 
+In the releases, there is an already published current version of the API with sample notes folder set up. 
 Unpack it into your site's location and modify `appsettings.json` and `web.config` according to your needs.
 
 API server should now be correctly set up.
