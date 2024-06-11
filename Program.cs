@@ -1,8 +1,15 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serilog;
 using ShareAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/logs.txt",
+        rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Information()
+    .CreateLogger();
 
 // Add services to the container.
 
@@ -23,6 +30,8 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddTransient<ISharingService, SharingService>();
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
 
