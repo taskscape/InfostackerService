@@ -15,7 +15,7 @@ public class SharingController : ControllerBase
         _sharingService = sharingService;
     }
 
-    [HttpPost("upload")]
+    [HttpPost("uploadmarkdownwithfiles")]
     [RateLimit(100, 86400)]
     public async Task<IActionResult> UploadMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files)
     {
