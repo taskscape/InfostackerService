@@ -78,7 +78,7 @@ public class SharingService : ISharingService
         IEnumerable<string> pdfUrls = pdfFiles.Select(file =>
         {
             string fileName = Path.GetFileName(file);
-            string? url = _linkGenerator.GetPathByAction("GetPdf", "Sharing", new { identifier, fileName });
+            string? url = _linkGenerator.GetPathByAction("GetPdf", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
@@ -107,7 +107,7 @@ public class SharingService : ISharingService
         IEnumerable<string> docUrls = docFiles.Select(file =>
         {
             string fileName = Path.GetFileName(file);
-            string? url = _linkGenerator.GetPathByAction("GetDoc", "Sharing", new { identifier, fileName });
+            string? url = _linkGenerator.GetPathByAction("GetDoc", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
@@ -135,7 +135,7 @@ public class SharingService : ISharingService
         IEnumerable<string> imagePaths = imageFiles.Select(file =>
         {
             string fileName = Path.GetFileName(file);
-            string? url = _linkGenerator.GetPathByAction("GetImage", "Sharing", new { identifier, fileName });
+            string? url = _linkGenerator.GetPathByAction("GetImage", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";

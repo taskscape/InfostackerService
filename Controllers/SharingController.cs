@@ -5,7 +5,7 @@ using ShareAPI.Services;
 namespace ShareAPI.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("sharing")]
 public class SharingController : ControllerBase
 {
     private readonly ISharingService _sharingService;
@@ -15,7 +15,7 @@ public class SharingController : ControllerBase
         _sharingService = sharingService;
     }
 
-    [HttpPost("UploadMarkdownWithFiles")]
+    [HttpPost("upload")]
     [RateLimit(100, 86400)]
     public async Task<IActionResult> UploadMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files)
     {
@@ -67,7 +67,7 @@ public class SharingController : ControllerBase
         return Ok(new { Message = "Markdown and files successfully deleted.", id = identifier });
     }
 
-    [HttpGet("Pdf/{identifier}/{fileName}")]
+    [HttpGet("pdf/{identifier}/{fileName}")]
     public async Task<IActionResult> GetPdf(string identifier, string fileName)
     {
         FileStream stream = await _sharingService.GetPdf(identifier, fileName);
@@ -78,7 +78,7 @@ public class SharingController : ControllerBase
         return File(stream, "application/pdf");
     }
 
-    [HttpGet("Doc/{identifier}/{fileName}")]
+    [HttpGet("doc/{identifier}/{fileName}")]
     public async Task<IActionResult> GetDoc(string identifier, string fileName)
     {
         FileStream stream = await _sharingService.GetDoc(identifier, fileName);
@@ -89,7 +89,7 @@ public class SharingController : ControllerBase
         return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     }
 
-    [HttpGet("Image/{identifier}/{fileName}")]
+    [HttpGet("image/{identifier}/{fileName}")]
     public async Task<IActionResult> GetImage(string identifier, string fileName)
     {
         FileStream stream = await _sharingService.GetImage(identifier, fileName);
