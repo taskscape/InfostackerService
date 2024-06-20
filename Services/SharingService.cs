@@ -1,8 +1,9 @@
+using System.Text.RegularExpressions;
 using Markdig;
 
 namespace ShareAPI.Services;
 
-public class SharingService : ISharingService
+public partial class SharingService : ISharingService
 {
     private readonly ILogger<SharingService> _logger;
     private readonly IConfiguration _configuration;
@@ -81,10 +82,10 @@ public class SharingService : ISharingService
             string? url = _linkGenerator.GetPathByAction("GetPdf", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
-            return $"{scheme}://{host}{url}";
+            return Uri.UnescapeDataString($"{scheme}://{host}{url}");
         });
-
-        var scripts = string.Empty;
+        
+        Regex regex = FileAttachmentRegex();
         // Adding PDFs to script
         foreach (string pdfUrl in pdfUrls)
         {
@@ -92,15 +93,19 @@ public class SharingService : ISharingService
             scriptTemplate = scriptTemplate.Replace("{pdfDivId}", $"{Guid.NewGuid()}");
             scriptTemplate = scriptTemplate.Replace("{pdfName}", $"\"{Path.GetFileName(pdfUrl)}\"");
             scriptTemplate = scriptTemplate.Replace("{token}", $"\"{_configuration.GetSection("AdobeAPIToken").Value}\"");
-            scripts += scriptTemplate;
+            MatchCollection matches = regex.Matches(htmlTemplate);
+            foreach (Match match in matches)
+            {
+                // check if the match value contains the file name without the first 9 random characters
+                if (!match.Value.Contains(Path.GetFileName(pdfUrl)[9..])) continue;
+                htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, scriptTemplate);
+                break;
+            }
+            
             scriptTemplate = File.ReadAllText(scriptTemplatePath);
         }
 
-        // Inserting PDFs into html
-        htmlTemplate = htmlTemplate.Replace("{pdfList}", scripts);
-
         // Getting docs
-        var docs = string.Empty;
         IEnumerable<string> docFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => Path.GetExtension(file) == ".doc" || Path.GetExtension(file) == ".docx");
 
@@ -110,19 +115,21 @@ public class SharingService : ISharingService
             string? url = _linkGenerator.GetPathByAction("GetDoc", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
-            return $"{scheme}://{host}{url}";
+            return Uri.UnescapeDataString($"{scheme}://{host}{url}");
         });
 
         // Adding iframes for each doc
         foreach (string docUrl in docUrls)
         {
-            docs += $"<iframe src=\"https://docs.google.com/viewer?url={docUrl}&embedded=true\"></iframe>\n";
+            MatchCollection matches = regex.Matches(htmlTemplate);
+            foreach (Match match in matches)
+            {
+                // check if the match value contains the file name without the first 9 random characters
+                if (!match.Value.Contains(Path.GetFileName(docUrl)[9..])) continue;
+                htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, $"<div class=\"docs-container\"><iframe src=\"https://docs.google.com/viewer?url={docUrl}&embedded=true\"></iframe></div>\n");
+                break;
+            }
         }
-
-        // Inserting the iframes into html
-        htmlTemplate = htmlTemplate.Replace("{docs}", docs);
-
-        var images = string.Empty;
         var acceptedFormats = new List<string>
         {
             ".jpg",
@@ -143,9 +150,15 @@ public class SharingService : ISharingService
 
         foreach (string imagePath in imagePaths)
         {
-            images += $"<img src={imagePath}>\n";
+            MatchCollection matches = regex.Matches(htmlTemplate);
+            foreach (Match match in matches)
+            {
+                // check if the match value contains the file name without the first 9 random characters
+                if (!match.Value.Contains(Path.GetFileName(Uri.UnescapeDataString(imagePath))[9..])) continue;
+                htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, $"<div class=\"image-container\"><img src={imagePath}></div>\n");
+                break;
+            }
         }
-        htmlTemplate = htmlTemplate.Replace("{images}", images);
         return Task.FromResult(htmlTemplate);
     }
 
@@ -250,4 +263,17 @@ public class SharingService : ISharingService
         var buffer = new Span<byte>(new byte[base64.Length]);
         return Convert.TryFromBase64String(base64, buffer , out int _);
     }
+    
+    private static string ReplaceFirstOccurrence(string source, string oldValue, string newValue)
+    {
+        int pos = source.IndexOf(oldValue);
+        if (pos < 0)
+        {
+            return source;
+        }
+        return source.Substring(0, pos) + newValue + source.Substring(pos + oldValue.Length);
+    }
+
+    [GeneratedRegex(@"!\[\[.*?\]\]")]
+    private static partial Regex FileAttachmentRegex();
 }
