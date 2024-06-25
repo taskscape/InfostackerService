@@ -12,7 +12,7 @@ var logger = new LoggerConfiguration()
     .CreateLogger();
 
 // Add services to the container.
-
+builder.Configuration.AddJsonFile("version.json");
 builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

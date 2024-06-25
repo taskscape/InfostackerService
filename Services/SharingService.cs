@@ -23,7 +23,7 @@ public partial class SharingService : ISharingService
         NotesFolderPath = _configuration.GetSection("NotesFolder").Value ?? string.Empty;
         TemplatePath = _configuration.GetSection("TemplatePath").Value ?? string.Empty;
         TemplateScriptPath = _configuration.GetSection("TemplateScriptPath").Value ?? string.Empty;
-        BuildVersion = _configuration.GetSection("Version").Value ?? string.Empty;
+        BuildVersion = _configuration.GetSection("version").Value ?? string.Empty;
     }
 
     public async Task<Guid> UploadMarkdownWithFiles(string markdown, List<IFormFile> files)
