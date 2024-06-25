@@ -100,6 +100,17 @@ public class SharingController : ControllerBase
         return File(stream, "image/png");
     }
     
+    [HttpGet("video/{identifier}/{fileName}")]
+    public async Task<IActionResult> GetVideo(string identifier, string fileName)
+    {
+        FileStream stream = await _sharingService.GetVideo(identifier, fileName);
+        if (stream is null)
+        {
+            return NotFound(new { Message = "Video does not exist.", id = identifier });
+        }
+        return File(stream, "video/mp4");
+    }
+    
     [HttpGet("version")]
     public async Task<IActionResult> GetVersion()
     {

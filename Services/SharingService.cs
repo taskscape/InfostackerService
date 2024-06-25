@@ -86,7 +86,7 @@ public partial class SharingService : ISharingService
         });
         
         Regex regex = FileAttachmentRegex();
-        // Adding PDFs to script
+        // Adding PDFs to template
         foreach (string pdfUrl in pdfUrls)
         {
             scriptTemplate = scriptTemplate.Replace("{pdfUrl}", $"\"{pdfUrl}\"");
@@ -118,7 +118,7 @@ public partial class SharingService : ISharingService
             return Uri.UnescapeDataString($"{scheme}://{host}{url}");
         });
 
-        // Adding iframes for each doc
+        // Adding docs to template
         foreach (string docUrl in docUrls)
         {
             MatchCollection matches = regex.Matches(htmlTemplate);
@@ -130,14 +130,15 @@ public partial class SharingService : ISharingService
                 break;
             }
         }
-        var acceptedFormats = new List<string>
+        var acceptedImageFormats = new List<string>
         {
             ".jpg",
             ".jpeg",
             ".png"
         };
+        // Getting images
         IEnumerable<string> imageFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
-            .Where(file => acceptedFormats.Contains(Path.GetExtension(file)));
+            .Where(file => acceptedImageFormats.Contains(Path.GetExtension(file)));
 
         IEnumerable<string> imagePaths = imageFiles.Select(file =>
         {
@@ -148,6 +149,7 @@ public partial class SharingService : ISharingService
             return $"{scheme}://{host}{url}";
         });
 
+        // Adding images to template
         foreach (string imagePath in imagePaths)
         {
             MatchCollection matches = regex.Matches(htmlTemplate);
@@ -156,6 +158,36 @@ public partial class SharingService : ISharingService
                 // check if the match value contains the file name without the first 9 random characters
                 if (!match.Value.Contains(Path.GetFileName(Uri.UnescapeDataString(imagePath))[9..])) continue;
                 htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, $"<div class=\"image-container\"><img src={imagePath}></div>\n");
+                break;
+            }
+        }
+        
+        var acceptedVideoFormats = new List<string>
+        {
+            ".mp4"
+        };
+        // Getting videos
+        IEnumerable<string> videoFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
+            .Where(file => acceptedVideoFormats.Contains(Path.GetExtension(file)));
+
+        IEnumerable<string> videoPaths = videoFiles.Select(file =>
+        {
+            string fileName = Path.GetFileName(file);
+            string? url = _linkGenerator.GetPathByAction("GetVideo", "sharing", new { identifier, fileName });
+            string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
+            return $"{scheme}://{host}{url}";
+        });
+
+        // Adding videos to template
+        foreach (string videoPath in videoPaths)
+        {
+            MatchCollection matches = regex.Matches(htmlTemplate);
+            foreach (Match match in matches)
+            {
+                // check if the match value contains the file name without the first 9 random characters
+                if (!match.Value.Contains(Path.GetFileName(Uri.UnescapeDataString(videoPath))[9..])) continue;
+                htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, $"<video class=\"video-container\" controls><source src={videoPath} type=\"video/mp4\"></video>\n");
                 break;
             }
         }
@@ -205,6 +237,13 @@ public partial class SharingService : ISharingService
     }
 
     public Task<FileStream> GetImage(string identifier, string fileName)
+    {
+        string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
+
+        return !File.Exists(filePath) ? Task.FromResult<FileStream>(null) : Task.FromResult(new FileStream(filePath, FileMode.Open, FileAccess.Read));
+    }
+    
+    public Task<FileStream> GetVideo(string identifier, string fileName)
     {
         string filePath = Path.Combine(NotesFolderPath, identifier, fileName);
 

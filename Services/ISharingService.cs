@@ -9,5 +9,6 @@ public interface ISharingService
     Task<FileStream> GetPdf(string identifier, string fileName);
     Task<FileStream> GetDoc(string identifier, string fileName);
     Task<FileStream> GetImage(string identifier, string fileName);
+    Task<FileStream> GetVideo(string identifier, string fileName);
     Task<object> GetVersion();
 }
