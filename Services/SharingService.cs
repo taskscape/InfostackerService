@@ -13,6 +13,7 @@ public partial class SharingService : ISharingService
     public required string? TemplatePath;
     public required string? TemplateScriptPath;
     public required string? BuildVersion;
+    public required int? MaxFileSize;
 
     public SharingService(ILogger<SharingService> logger, IConfiguration configuration, LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor)
     {
@@ -24,11 +25,18 @@ public partial class SharingService : ISharingService
         TemplatePath = _configuration.GetSection("TemplatePath").Value ?? string.Empty;
         TemplateScriptPath = _configuration.GetSection("TemplateScriptPath").Value ?? string.Empty;
         BuildVersion = _configuration.GetSection("version").Value ?? string.Empty;
+        MaxFileSize = int.Parse(_configuration.GetSection("MaxFileSizeInBytes").Value);
     }
 
     public async Task<Guid> UploadMarkdownWithFiles(string markdown, List<IFormFile> files)
     {
         var identifier = Guid.NewGuid();
+
+        if (files.Any(file => file.Length > MaxFileSize))
+        {
+            _logger.LogInformation("File exceeded max size, discarding note.");
+            return Guid.Empty;
+        }
 
         // Create a directory with the GUID as its name
         string directoryPath = Path.Combine(NotesFolderPath, identifier.ToString());
@@ -196,6 +204,12 @@ public partial class SharingService : ISharingService
 
     public async Task<bool> UpdateMarkdownWithFiles(string markdown, List<IFormFile> files, Guid identifier)
     {
+        if (files.Any(file => file.Length > MaxFileSize))
+        {
+            _logger.LogInformation("File exceeded max size, discarding note.");
+            return false;
+        }
+        
         // Create a directory with the GUID as its name
         string directoryPath = Path.Combine(NotesFolderPath, identifier.ToString());
         if (!Directory.Exists(directoryPath))

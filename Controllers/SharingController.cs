@@ -22,7 +22,7 @@ public class SharingController : ControllerBase
         Guid identifier = await _sharingService.UploadMarkdownWithFiles(markdown, files);
         if (identifier == Guid.Empty)
         {
-            BadRequest(new { Message = "There was an error while processing the request.", id = identifier });
+            return BadRequest(new { Message = "There was an error while processing the request.", id = identifier });
         }
 
         return Ok(new { Message = "Markdown and files uploaded successfully.", id = identifier });
