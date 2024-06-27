@@ -82,7 +82,7 @@ public partial class SharingService : ISharingService
 
         // Getting PDFs
         IEnumerable<string> pdfFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
-            .Where(file => Path.GetExtension(file) == ".pdf");
+            .Where(file => Path.GetExtension(file).Equals(".pdf", StringComparison.InvariantCultureIgnoreCase));
 
         IEnumerable<string> pdfUrls = pdfFiles.Select(file =>
         {
@@ -115,7 +115,8 @@ public partial class SharingService : ISharingService
 
         // Getting docs
         IEnumerable<string> docFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
-            .Where(file => Path.GetExtension(file) == ".doc" || Path.GetExtension(file) == ".docx");
+            .Where(file => Path.GetExtension(file).Equals(".doc", StringComparison.InvariantCultureIgnoreCase) || 
+                           Path.GetExtension(file).Equals(".docx", StringComparison.InvariantCultureIgnoreCase));
 
         IEnumerable<string> docUrls = docFiles.Select(file =>
         {
@@ -146,7 +147,7 @@ public partial class SharingService : ISharingService
         };
         // Getting images
         IEnumerable<string> imageFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
-            .Where(file => acceptedImageFormats.Contains(Path.GetExtension(file)));
+            .Where(file => acceptedImageFormats.Contains(Path.GetExtension(file).ToLowerInvariant()));
 
         IEnumerable<string> imagePaths = imageFiles.Select(file =>
         {
@@ -176,7 +177,7 @@ public partial class SharingService : ISharingService
         };
         // Getting videos
         IEnumerable<string> videoFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
-            .Where(file => acceptedVideoFormats.Contains(Path.GetExtension(file)));
+            .Where(file => acceptedVideoFormats.Contains(Path.GetExtension(file).ToLowerInvariant()));
 
         IEnumerable<string> videoPaths = videoFiles.Select(file =>
         {
