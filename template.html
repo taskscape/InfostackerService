@@ -11,6 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             justify-content: center;
             align-items: center;
@@ -63,6 +64,7 @@
             height: auto;
             display: block;
         }
+
         .content h1,
         .content h2,
         .content h3,
@@ -100,27 +102,34 @@
         }
 
         .content p {
+            font-size: 18px; /* Slightly larger font size for better readability */
             margin-bottom: 1em;
+            line-height: 1.6; /* Ensure consistent line spacing */
         }
+
         .pdf-container {
             display: flex;
             flex-wrap: wrap;
             height: 60%;
         }
+
         .pdf-container-item {
             height: 50vw;
             margin: 1%;
         }
+
         .docs-container {
             display: flex;
             flex-wrap: wrap;
             height: 60%;
         }
-        .docs-container iframe {
-            width: 100%;
-            height: 90vh;
-            margin: 1%;
-        }
+
+            .docs-container iframe {
+                width: 100%;
+                height: 90vh;
+                margin: 1%;
+            }
+
         @media (max-width: 600px) {
             .content {
                 padding: 15px;
