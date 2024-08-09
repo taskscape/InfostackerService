@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -24,18 +27,44 @@
             line-height: 1.6;
         }
 
-        .header {
+        .upperline {
+            border-top: 5px solid #2a6fc3;
+        }
+
+        .footer {
             background-color: #F9F9F9;
             padding: 20px;
             width: 100%;
             box-sizing: border-box;
             line-height: 1.5;
             border-top: 5px solid #2a6fc3;
+            bottom: 0; /* Stick to the bottom */
+            left: 0; /* Span the full width of the viewport */
+            display: flex; /* Use flexbox for layout */
+            align-items: center; /* Align items vertically center */
+            justify-content: space-between; /* Space items out */
         }
 
-            .header img {
-                width: auto;
+            .footer img {
+                height: calc(0.75 * 50px); /* Set the height of the image */
+                margin-right: 20px; /* Optional: Space between image and text */
             }
+
+            .footer .footer-content {
+                display: flex; /* Flex container for the text */
+                flex-direction: column; /* Stack text vertically */
+                align-items: flex-end; /* Align text to the start of the flex container */
+            }
+
+                .footer .footer-content p {
+                    margin: 0;
+                    font-size: 10px;
+                }
+
+                .footer .footer-content a {
+                    color: #2a6fc3; /* Optional: Style the link */
+                    text-decoration: none; /* Optional: Remove underline from the link */
+                }
 
         .container {
             display: flex;
@@ -43,6 +72,8 @@
             align-items: center;
             width: 100%;
             padding: 20px;
+            padding-bottom: 0px;
+            margin-bottom: 0px;
         }
 
         .content {
@@ -56,7 +87,14 @@
                 width: 100%;
                 height: auto;
                 display: block;
-                margin-bottom: 20px;
+            }
+
+            .content ol {
+                padding-left: 19px;
+            }
+
+            .content ul {
+                padding-left: 20px;
             }
 
         .video-container {
@@ -148,13 +186,47 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <img alt="Infostacker Logo" src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDI5OSA1MCIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI1MCI+Cgk8dGl0bGU+aW5mb3N0YWNrZXIgbG9nbyAyIC0gY29sb3Itc3ZnPC90aXRsZT4KCTxzdHlsZT4KCQkudDEgeyBmb250LXNpemU6IDE2MHB4OyBmaWxsOiAjNTBjMWU5OyBmb250LXdlaWdodDogNDAwOyBmb250LWZhbWlseTogIlBvcHBpbnMiLCBBcmlhbCwgc2Fucy1zZXJpZjsgfQoJPC9zdHlsZT4KCTxkZWZzPgoJCTxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgyPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgwLC0yOS41OSwxMS44MzYsMCw0Myw0NS42NjQpIj4KCQkJPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDM2MmIwIi8+CgkJCTxzdG9wIG9mZnNldD0iLjExMiIgc3RvcC1jb2xvcj0iIzAzNmFiZCIvPgoJCQk8c3RvcCBvZmZzZXQ9Ii4yNTgiIHN0b3AtY29sb3I9IiMwMzZmYzUiLz4KCQkJPHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzAzNzBjOCIvPgoJCQk8c3RvcCBvZmZzZXQ9Ii43NDIiIHN0b3AtY29sb3I9IiMwMzZmYzUiLz4KCQkJPHN0b3Agb2Zmc2V0PSIuODg4IiBzdG9wLWNvbG9yPSIjMDM2YWJkIi8+CgkJCTxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAzNjJiMCIvPgoJCTwvbGluZWFyR3JhZGllbnQ+CgkJPGxpbmVhckdyYWRpZW50IGlkPSJnMiIgeDI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDMyLDAsMCwzOCw4LDI2KSI+CgkJCTxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzMyYmRlZiIvPgoJCQk8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZWEyZTQiLz4KCQk8L2xpbmVhckdyYWRpZW50PgoJCTxsaW5lYXJHcmFkaWVudCBpZD0iZzMiIHgyPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgwLC0xNC45NDgsNy45NzIsMCwyMywzNSkiPgoJCQk8c3RvcCBvZmZzZXQ9Ii4yNzMiIHN0b3AtY29sb3I9IiM4ZGQzZmYiLz4KCQkJPHN0b3Agb2Zmc2V0PSIuNjExIiBzdG9wLWNvbG9yPSIjNzBjYWZmIi8+CgkJCTxzdG9wIG9mZnNldD0iLjc5NSIgc3RvcC1jb2xvcj0iIzU3YzJmZiIvPgoJCQk8c3RvcCBvZmZzZXQ9Ii45NCIgc3RvcC1jb2xvcj0iIzQ2YmRmZiIvPgoJCQk8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMzY2JhZmYiLz4KCQk8L2xpbmVhckdyYWRpZW50PgoJCTxsaW5lYXJHcmFkaWVudCBpZD0iZzQiIHgyPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgxNiwxNiwtMjEuMDYyLDIxLjA2MiwzMSwxOCkiPgoJCQk8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4ZGQzZmYiLz4KCQkJPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjM2NiYWZmIi8+CgkJPC9saW5lYXJHcmFkaWVudD4KCTwvZGVmcz4KCTxzdHlsZT4KCQl0c3BhbiB7IHdoaXRlLXNwYWNlOiBwcmU7IH0KCQkuczAgeyBmaWxsOiB1cmwoI2cxKTsgfQoJCS5zMSB7IGZpbGw6IHVybCgjZzIpOyB9CgkJLnMyIHsgZmlsbDogdXJsKCNnMyk7IH0KCQkuczMgeyBmaWxsOiB1cmwoI2c0KTsgfQoJCS50NCB7IGZvbnQtc2l6ZTogMTYwcHg7IGZpbGw6ICM1MGMxZTk7IGZvbnQtZmFtaWx5OiAiUG9wcGlucyI7IH0KCTwvc3R5bGU+Cgk8ZyBpZD0iMSI+CgkJPHBhdGggaWQ9IkxheWVyIiBjbGFzcz0iczAiIGQ9Im01OS44IDQwLjJsLTQuOCA0Ljh2LTE0YzAtMC42IDAuNC0xIDEtMWg0YzAuNiAwIDEgMC40IDEgMXY2LjNjMCAxLjEtMC40IDIuMS0xLjIgMi45eiIvPgoJCTxwYXRoIGlkPSJMYXllciIgY2xhc3M9InMxIiBkPSJtNTUgMzl2NmgtMjhjLTIuMiAwLTQtMS44LTQtNHYtMzNjMC0wLjYgMC40LTEgMS0xaDRjMC42IDAgMSAwLjQgMSAxdjMwYzAgMC42IDAuNCAxIDEgMXoiLz4KCQk8cGF0aCBpZD0iTGF5ZXIiIGNsYXNzPSJzMiIgZD0ibTQyIDIwdjEzYzAgMS4xLTAuOSAyLTIgMmgtNGMtMS4xIDAtMi0wLjktMi0ydi0xM3oiLz4KCQk8cGF0aCBpZD0iTGF5ZXIiIGNsYXNzPSJzMyIgZD0ibTYyLjYgMTUuNGwtOS05LjFjLTAuMy0wLjMtMC43LTAuNC0xLTAuMi0wLjQgMC4xLTAuNiAwLjQtMC42IDAuOHY1LjFoLTYuN2MtMi4xIDAtNC4xIDAuOC01LjYgMi4zbC01LjcgNS43aDE4djUuMWMwIDAuNCAwLjIgMC43IDAuNiAwLjhxMC4xIDAuMSAwLjMgMC4xIDAuNCAwIDAuNy0wLjNsOS05LjFjMC40LTAuMyAwLjQtMC45IDAtMS4yeiIvPgoJCTxnIGlkPSJJTkZPU1RBQ0tFUiI+CgkJCTx0ZXh0IGlkPSJJTkZPU1RBQ0tFUiIgc3R5bGU9InRyYW5zZm9ybTogbWF0cml4KC4xOTgsMCwwLC4xOTgsNzEuMTM4LDkuOTAxKSI+CgkJCQk8dHNwYW4geD0iMCIgeT0iMTM5LjQiIGNsYXNzPSJ0MSI+STwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+TjwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+RjwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+TzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+UzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+VDwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+QTwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+QzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+SzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+RTwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+UjwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+CgkJCQk8L3RzcGFuPgoJCQk8L3RleHQ+CgkJPC9nPgoJPC9nPgo8L3N2Zz4K" />
-    </div>
+    <div class="upperline"/>
     <div class="container">
         <div class="content">
             {markdown}
         </div>
     </div>
+    <div class="footer">
+        <img alt="Infostacker Logo" src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDI5OSA1MCIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI1MCI+Cgk8dGl0bGU+aW5mb3N0YWNrZXIgbG9nbyAyIC0gY29sb3Itc3ZnPC90aXRsZT4KCTxzdHlsZT4KCQkudDEgeyBmb250LXNpemU6IDE2MHB4OyBmaWxsOiAjNTBjMWU5OyBmb250LXdlaWdodDogNDAwOyBmb250LWZhbWlseTogIlBvcHBpbnMiLCBBcmlhbCwgc2Fucy1zZXJpZjsgfQoJPC9zdHlsZT4KCTxkZWZzPgoJCTxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgyPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgwLC0yOS41OSwxMS44MzYsMCw0Myw0NS42NjQpIj4KCQkJPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDM2MmIwIi8+CgkJCTxzdG9wIG9mZnNldD0iLjExMiIgc3RvcC1jb2xvcj0iIzAzNmFiZCIvPgoJCQk8c3RvcCBvZmZzZXQ9Ii4yNTgiIHN0b3AtY29sb3I9IiMwMzZmYzUiLz4KCQkJPHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzAzNzBjOCIvPgoJCQk8c3RvcCBvZmZzZXQ9Ii43NDIiIHN0b3AtY29sb3I9IiMwMzZmYzUiLz4KCQkJPHN0b3Agb2Zmc2V0PSIuODg4IiBzdG9wLWNvbG9yPSIjMDM2YWJkIi8+CgkJCTxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAzNjJiMCIvPgoJCTwvbGluZWFyR3JhZGllbnQ+CgkJPGxpbmVhckdyYWRpZW50IGlkPSJnMiIgeDI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDMyLDAsMCwzOCw4LDI2KSI+CgkJCTxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzMyYmRlZiIvPgoJCQk8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZWEyZTQiLz4KCQk8L2xpbmVhckdyYWRpZW50PgoJCTxsaW5lYXJHcmFkaWVudCBpZD0iZzMiIHgyPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgwLC0xNC45NDgsNy45NzIsMCwyMywzNSkiPgoJCQk8c3RvcCBvZmZzZXQ9Ii4yNzMiIHN0b3AtY29sb3I9IiM4ZGQzZmYiLz4KCQkJPHN0b3Agb2Zmc2V0PSIuNjExIiBzdG9wLWNvbG9yPSIjNzBjYWZmIi8+CgkJCTxzdG9wIG9mZnNldD0iLjc5NSIgc3RvcC1jb2xvcj0iIzU3YzJmZiIvPgoJCQk8c3RvcCBvZmZzZXQ9Ii45NCIgc3RvcC1jb2xvcj0iIzQ2YmRmZiIvPgoJCQk8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMzY2JhZmYiLz4KCQk8L2xpbmVhckdyYWRpZW50PgoJCTxsaW5lYXJHcmFkaWVudCBpZD0iZzQiIHgyPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgxNiwxNiwtMjEuMDYyLDIxLjA2MiwzMSwxOCkiPgoJCQk8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4ZGQzZmYiLz4KCQkJPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjM2NiYWZmIi8+CgkJPC9saW5lYXJHcmFkaWVudD4KCTwvZGVmcz4KCTxzdHlsZT4KCQl0c3BhbiB7IHdoaXRlLXNwYWNlOiBwcmU7IH0KCQkuczAgeyBmaWxsOiB1cmwoI2cxKTsgfQoJCS5zMSB7IGZpbGw6IHVybCgjZzIpOyB9CgkJLnMyIHsgZmlsbDogdXJsKCNnMyk7IH0KCQkuczMgeyBmaWxsOiB1cmwoI2c0KTsgfQoJCS50NCB7IGZvbnQtc2l6ZTogMTYwcHg7IGZpbGw6ICM1MGMxZTk7IGZvbnQtZmFtaWx5OiAiUG9wcGlucyI7IH0KCTwvc3R5bGU+Cgk8ZyBpZD0iMSI+CgkJPHBhdGggaWQ9IkxheWVyIiBjbGFzcz0iczAiIGQ9Im01OS44IDQwLjJsLTQuOCA0Ljh2LTE0YzAtMC42IDAuNC0xIDEtMWg0YzAuNiAwIDEgMC40IDEgMXY2LjNjMCAxLjEtMC40IDIuMS0xLjIgMi45eiIvPgoJCTxwYXRoIGlkPSJMYXllciIgY2xhc3M9InMxIiBkPSJtNTUgMzl2NmgtMjhjLTIuMiAwLTQtMS44LTQtNHYtMzNjMC0wLjYgMC40LTEgMS0xaDRjMC42IDAgMSAwLjQgMSAxdjMwYzAgMC42IDAuNCAxIDEgMXoiLz4KCQk8cGF0aCBpZD0iTGF5ZXIiIGNsYXNzPSJzMiIgZD0ibTQyIDIwdjEzYzAgMS4xLTAuOSAyLTIgMmgtNGMtMS4xIDAtMi0wLjktMi0ydi0xM3oiLz4KCQk8cGF0aCBpZD0iTGF5ZXIiIGNsYXNzPSJzMyIgZD0ibTYyLjYgMTUuNGwtOS05LjFjLTAuMy0wLjMtMC43LTAuNC0xLTAuMi0wLjQgMC4xLTAuNiAwLjQtMC42IDAuOHY1LjFoLTYuN2MtMi4xIDAtNC4xIDAuOC01LjYgMi4zbC01LjcgNS43aDE4djUuMWMwIDAuNCAwLjIgMC43IDAuNiAwLjhxMC4xIDAuMSAwLjMgMC4xIDAuNCAwIDAuNy0wLjNsOS05LjFjMC40LTAuMyAwLjQtMC45IDAtMS4yeiIvPgoJCTxnIGlkPSJJTkZPU1RBQ0tFUiI+CgkJCTx0ZXh0IGlkPSJJTkZPU1RBQ0tFUiIgc3R5bGU9InRyYW5zZm9ybTogbWF0cml4KC4xOTgsMCwwLC4xOTgsNzEuMTM4LDkuOTAxKSI+CgkJCQk8dHNwYW4geD0iMCIgeT0iMTM5LjQiIGNsYXNzPSJ0MSI+STwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+TjwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+RjwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+TzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+UzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+VDwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+QTwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+QzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+SzwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+RTwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+UjwvdHNwYW4+CgkJCQk8dHNwYW4geT0iMTM5LjQiIGNsYXNzPSJ0MSI+CgkJCQk8L3RzcGFuPgoJCQk8L3RleHQ+CgkJPC9nPgoJPC9nPgo8L3N2Zz4K" />
+        <div class="footer-content">
+            <p>Copyright 2024 Infostacker.</p>
+            <p>Please visit our website <a href="https://infostacker.com" target="_blank">infostacker.com</a> to publish your own notes from Obsidian</p>
+        </div>
+    </div>
+    <script type="text/javascript">
+        window.onload = function () {
+            // Style the first <p> element as <h1>
+            const firstParagraph = document.querySelector('p');
+            if (firstParagraph) {
+                firstParagraph.style.fontSize = '40px';
+                firstParagraph.style.fontWeight = 'bold';
+                firstParagraph.style.marginTop = '1em';
+                firstParagraph.style.marginBottom = '0.5em';
+                firstParagraph.style.color = '#333'; // Match the color for <h1>
+                // Add more styles if needed
+            }
+
+            // Existing code to style the "tags:" paragraph
+            const tagsParagraph = Array.from(document.querySelectorAll('p')).find(p => p.innerText.trim() === 'tags:');
+            if (tagsParagraph) {
+                tagsParagraph.style.fontSize = '22px';
+                tagsParagraph.style.textTransform = 'uppercase';
+                tagsParagraph.style.fontWeight = 'bold';
+                tagsParagraph.style.marginBottom = '0';
+                const tagsList = tagsParagraph.nextElementSibling;
+                if (tagsList && tagsList.tagName.toLowerCase() === 'ul') {
+                    tagsList.style.listStylePosition = 'inside';
+                    tagsList.style.paddingLeft = '4px';
+                    tagsList.style.marginTop = '0';
+                }
+            }
+        };
+    </script>
 </body>
 </html>
