@@ -30,7 +30,7 @@ public partial class SharingService : ISharingService
 
     public async Task<Guid> UploadMarkdownWithFiles(string markdown, List<IFormFile> files)
     {
-        var identifier = Guid.NewGuid();
+        Guid identifier = Guid.NewGuid();
 
         if (files.Any(file => file.Length > MaxFileSize))
         {
@@ -89,7 +89,7 @@ public partial class SharingService : ISharingService
             string fileName = Path.GetFileName(file);
             string? url = _linkGenerator.GetPathByAction("GetPdf", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
-            var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
+            string host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return Uri.UnescapeDataString($"{scheme}://{host}{url}");
         });
         
@@ -123,7 +123,7 @@ public partial class SharingService : ISharingService
             string fileName = Path.GetFileName(file);
             string? url = _linkGenerator.GetPathByAction("GetDoc", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
-            var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
+            string host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return Uri.UnescapeDataString($"{scheme}://{host}{url}");
         });
 
@@ -139,7 +139,7 @@ public partial class SharingService : ISharingService
                 break;
             }
         }
-        var acceptedImageFormats = new List<string>
+        List<string> acceptedImageFormats = new List<string>
         {
             ".jpg",
             ".jpeg",
@@ -154,7 +154,7 @@ public partial class SharingService : ISharingService
             string fileName = Path.GetFileName(file);
             string? url = _linkGenerator.GetPathByAction("GetImage", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
-            var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
+            string host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
         });
 
@@ -171,7 +171,7 @@ public partial class SharingService : ISharingService
             }
         }
         
-        var acceptedVideoFormats = new List<string>
+        List<string> acceptedVideoFormats = new List<string>
         {
             ".mp4"
         };
@@ -184,7 +184,7 @@ public partial class SharingService : ISharingService
             string fileName = Path.GetFileName(file);
             string? url = _linkGenerator.GetPathByAction("GetVideo", "sharing", new { identifier, fileName });
             string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
-            var host = _httpContextAccessor.HttpContext.Request.Host.ToString();
+            string host = _httpContextAccessor.HttpContext.Request.Host.ToString();
             return $"{scheme}://{host}{url}";
         });
 
@@ -290,8 +290,8 @@ public partial class SharingService : ISharingService
             _logger.LogInformation($"Received file: {file.FileName}");
 
             // Save each file in the directory
-            var random = new Random();
-            var uniqueFileName = $"{random.Next():x}-{file.FileName}";
+            Random random = new();
+            string uniqueFileName = $"{random.Next():x}-{file.FileName}";
             string filePath = Path.Combine(directoryPath, uniqueFileName);
 
             await using (FileStream stream = new(filePath, FileMode.Create))
@@ -314,7 +314,7 @@ public partial class SharingService : ISharingService
     
     private static bool IsBase64String(string base64)
     {
-        var buffer = new Span<byte>(new byte[base64.Length]);
+        Span<byte> buffer = new(new byte[base64.Length]);
         return Convert.TryFromBase64String(base64, buffer , out int _);
     }
     
@@ -325,7 +325,7 @@ public partial class SharingService : ISharingService
         {
             return source;
         }
-        return source.Substring(0, pos) + newValue + source.Substring(pos + oldValue.Length);
+        return source[..pos] + newValue + source[(pos + oldValue.Length)..];
     }
 
     [GeneratedRegex(@"!\[\[.*?\]\]")]

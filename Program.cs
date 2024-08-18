@@ -1,10 +1,11 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
+using Serilog.Core;
 using ShareAPI.Services;
 
-var builder = WebApplication.CreateBuilder(args);
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-var logger = new LoggerConfiguration()
+WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
+string? MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+Logger? logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/logs.txt",
         rollingInterval: RollingInterval.Day)
@@ -33,7 +34,7 @@ builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
-var app = builder.Build();
+WebApplication? app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

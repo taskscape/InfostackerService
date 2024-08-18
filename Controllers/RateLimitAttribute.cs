@@ -18,7 +18,7 @@ namespace ShareAPI.Controllers
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var cache = context.HttpContext.RequestServices.GetService<IMemoryCache>();
+            IMemoryCache? cache = context.HttpContext.RequestServices.GetService<IMemoryCache>();
             if (cache == null)
             {
                 context.Result = new ContentResult
@@ -29,7 +29,7 @@ namespace ShareAPI.Controllers
                 return;
             }
 
-            var ipAddress = context.HttpContext.Connection.RemoteIpAddress?.ToString();
+            string? ipAddress = context.HttpContext.Connection.RemoteIpAddress?.ToString();
 
             if (ipAddress == null)
             {
@@ -41,7 +41,7 @@ namespace ShareAPI.Controllers
                 return;
             }
 
-            var cacheKey = $"{ipAddress}:{DateTime.UtcNow.Date}";
+            string? cacheKey = $"{ipAddress}:{DateTime.UtcNow.Date}";
             int requests = cache.GetOrCreate(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = _resetInterval;
