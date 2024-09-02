@@ -76,6 +76,11 @@ public partial class SharingService : ISharingService
         string? scriptTemplatePath = TemplateScriptPath;
         string htmlTemplate = File.ReadAllText(templatePath);
         string scriptTemplate = File.ReadAllText(scriptTemplatePath);
+        
+        // Setting note page title
+        int titleEnd = markdownContent.IndexOf('\n');
+        string noteTitle = markdownContent[..titleEnd];
+        htmlTemplate = htmlTemplate.Replace("{title}", noteTitle);
 
         // Inserting markdown content into html
         htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
