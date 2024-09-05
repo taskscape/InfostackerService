@@ -33,8 +33,8 @@ VersionInfoVersion={#DateShort}
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "readme.md"; DestDir: "{app}"; Excludes: "*.pdb, web.config, appsettings.json"; Flags: ignoreversion;
-Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "readme.md"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "publish\*"; DestDir: "{app}"; Excludes: "*.pdb, web.config, appsettings.json"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "publish\web.config"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist;
 Source: "publish\appsettings.json"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist;
 
