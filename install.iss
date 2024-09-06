@@ -5,7 +5,7 @@
 
 AppId={{195D9982-0962-4B7A-B435-AE01735013B2}
 AppName=InfostackerService
-AppVersion=1.3.4
+AppVersion=1.3.5
 AppVerName=InfostackerService {#Date}
 AppPublisher=Taskscape Ltd
 CreateAppDir=yes
