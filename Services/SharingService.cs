@@ -64,6 +64,7 @@ public partial class SharingService : ISharingService
         {
             return Task.FromResult<string>(null);
         }
+        _logger.LogInformation("Markdown file found in \"{path}\"", markdownFilePath);
 
         // Read the content of the markdown file
         string markdownContent = File.ReadAllText(markdownFilePath);
@@ -78,9 +79,19 @@ public partial class SharingService : ISharingService
         string scriptTemplate = File.ReadAllText(scriptTemplatePath);
         
         // Setting note page title
-        int titleEnd = markdownContent.IndexOf('\n');
-        string noteTitle = markdownContent[..titleEnd];
-        htmlTemplate = htmlTemplate.Replace("{title}", noteTitle);
+        try
+        {
+            int titleEnd = markdownContent.IndexOf('\n');
+            string noteTitle = markdownContent[..titleEnd];
+            _logger.LogInformation("Title extracted from markdown as \"{title}\"", noteTitle);
+            htmlTemplate = htmlTemplate.Replace("{title}", noteTitle);
+            string[] lines = htmlTemplate.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries);
+            _logger.LogInformation("Title line after replacement action: {titleLine}", lines[3]);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error while replacing title: \"{error}\"", e);
+        }
 
         // Inserting markdown content into html
         htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
