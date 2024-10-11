@@ -94,6 +94,7 @@ public partial class SharingService : ISharingService
         }
 
         // Inserting markdown content into html
+        _logger.LogInformation("Replacing markdown placeholder tag with html");
         htmlTemplate = htmlTemplate.Replace("{markdown}", htmlContent);
 
         // Getting PDFs

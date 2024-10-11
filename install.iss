@@ -38,4 +38,41 @@ Source: "publish\*"; DestDir: "{app}"; Excludes: "*.pdb, web.config, appsettings
 Source: "publish\web.config"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist;
 Source: "publish\appsettings.json"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist;
 
+[Code]
+procedure DeleteUnwantedFiles;
+var
+  FindHandle: Integer;
+  FindData: TFindRec;
+  FileToDelete: String;
+begin
+  // Start searching for files in the {app} directory
+  if FindFirst(ExpandConstant('{app}\*.*'), FindData) then
+  begin
+    try
+      repeat
+        FileToDelete := FindData.Name;
 
+        // Skip directories, 'web.config', and 'appsettings.json'
+        if (FindData.Attributes and FILE_ATTRIBUTE_DIRECTORY = 0) and 
+           (CompareText(FileToDelete, 'web.config') <> 0) and 
+           (CompareText(FileToDelete, 'appsettings.json') <> 0) then
+        begin
+          // Delete the file
+          DeleteFile(ExpandConstant('{app}\') + FileToDelete);
+        end;
+
+      until not FindNext(FindData);
+    finally
+      FindClose(FindData);
+    end;
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssInstall then
+  begin
+    // Call the procedure to delete unwanted files just before installation
+    DeleteUnwantedFiles;
+  end;
+end;
