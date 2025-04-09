@@ -5,12 +5,14 @@ using ShareAPI.Services;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 string? MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+string seqServer = string.IsNullOrWhiteSpace(builder.Configuration.GetValue<string>("SeqServer")) ? "https://localhost:5341" : builder.Configuration.GetValue<string>("SeqServer");
+
 Logger? logger = new LoggerConfiguration()
     .Enrich.WithProperty("Application", "InfostackerService")
     .WriteTo.Console()
     .WriteTo.File("Logs/logs.txt",
         rollingInterval: RollingInterval.Day)
-    .WriteTo.Seq(builder.Configuration.GetValue<string>("SeqServer") ?? "http://localhost:5341")
+    .WriteTo.Seq(seqServer ?? "https://localhost:5341")
     .MinimumLevel.Information()
     .CreateLogger();
 

@@ -81,12 +81,14 @@ public partial class SharingService : ISharingService
         // Setting note page title
         try
         {
-            int titleEnd = markdownContent.IndexOf('\n');
-            string noteTitle = markdownContent[..titleEnd];
+            string[] markdownLines = markdownContent.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+            string noteTitle = markdownLines.Length > 0 ? markdownLines[0].TrimEnd() : string.Empty;
+    
             _logger.LogInformation("Title extracted from markdown as \"{title}\"", noteTitle);
             htmlTemplate = htmlTemplate.Replace("{title}", noteTitle);
-            string[] lines = htmlTemplate.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries);
-            _logger.LogInformation("Title line after replacement action: {titleLine}", lines[3]);
+            
+            string[] htmlLines = htmlTemplate.Split([Environment.NewLine], StringSplitOptions.None);
+            _logger.LogInformation("Title line after replacement action: {titleLine}", htmlLines[3]);
         }
         catch (Exception e)
         {
