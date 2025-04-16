@@ -77,12 +77,19 @@ public partial class SharingService : ISharingService
         string? scriptTemplatePath = TemplateScriptPath;
         string htmlTemplate = File.ReadAllText(templatePath);
         string scriptTemplate = File.ReadAllText(scriptTemplatePath);
-        
+        Regex regex = FileAttachmentRegex();
+
         // Setting note page title
         try
         {
             string[] markdownLines = markdownContent.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
             string noteTitle = markdownLines.Length > 0 ? markdownLines[0].TrimEnd() : string.Empty;
+
+            if (regex.Matches(noteTitle).Any())
+            {
+                markdownLines = new[] { "Untitled", "\n" }.Concat(markdownLines).ToArray();
+                noteTitle = "Untitled";
+            }
     
             _logger.LogInformation("Title extracted from markdown as \"{title}\"", noteTitle);
             htmlTemplate = htmlTemplate.Replace("{title}", noteTitle);
@@ -112,7 +119,6 @@ public partial class SharingService : ISharingService
             return Uri.UnescapeDataString($"{scheme}://{host}{url}");
         });
         
-        Regex regex = FileAttachmentRegex();
         // Adding PDFs to template
         foreach (string pdfUrl in pdfUrls)
         {
