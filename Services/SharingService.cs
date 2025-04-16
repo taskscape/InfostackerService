@@ -125,7 +125,7 @@ public partial class SharingService : ISharingService
             foreach (Match match in matches)
             {
                 // check if the match value contains the file name without the first 9 random characters
-                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\-]", "_");
+                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\- ]", "_");
                 if (!sanitizedMatch.Contains(Path.GetFileName(pdfUrl)[9..])) continue;
                 htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, scriptTemplate);
                 break;
@@ -155,7 +155,7 @@ public partial class SharingService : ISharingService
             foreach (Match match in matches)
             {
                 // check if the match value contains the file name without the first 9 random characters
-                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\-]", "_");
+                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\- ]", "_");
                 if (!sanitizedMatch.Contains(Path.GetFileName(docUrl)[9..])) continue;
                 htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, $"<div class=\"docs-container\"><iframe src=\"https://docs.google.com/viewer?url={docUrl}&embedded=true\"></iframe></div>\n");
                 break;
@@ -187,7 +187,7 @@ public partial class SharingService : ISharingService
             foreach (Match match in matches)
             {
                 // check if the match value contains the file name without the first 9 random characters
-                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\-]", "_");
+                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\- ]", "_");
                 if (!sanitizedMatch.Contains(Path.GetFileName(Uri.UnescapeDataString(imagePath))[9..])) continue;
                 htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, $"<div class=\"image-container\"><img src=\"{imagePath}\"></div>\n");
                 break;
@@ -218,7 +218,7 @@ public partial class SharingService : ISharingService
             foreach (Match match in matches)
             {
                 // check if the match value contains the file name without the first 9 random characters
-                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\-]", "_");
+                string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\- ]", "_");
                 if (!sanitizedMatch.Contains(Path.GetFileName(Uri.UnescapeDataString(videoPath))[9..])) continue;
                 htmlTemplate = ReplaceFirstOccurrence(htmlTemplate, match.Value, $"<video class=\"video-container\" controls><source src={videoPath} type=\"video/mp4\"></video>\n");
                 break;
@@ -313,7 +313,7 @@ public partial class SharingService : ISharingService
             // Log the file name
             _logger.LogInformation($"Received file: {file.FileName}");
 
-            string filename = Regex.Replace(file.FileName, @"[^a-zA-Z0-9().\-]", "_");
+            string filename = Regex.Replace(file.FileName, @"[^a-zA-Z0-9().\- ]", "_");
             //string filename = file.FileName;
 
             // Save each file in the directory
