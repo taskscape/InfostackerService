@@ -1,4 +1,4 @@
-namespace ShareAPI.Services;
+namespace Infostacker.Services;
 
 public interface ISharingService
 {

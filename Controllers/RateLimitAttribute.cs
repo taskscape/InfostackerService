@@ -1,20 +1,13 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
-using System.Net;
 
-namespace ShareAPI.Controllers
+namespace Infostacker.Controllers
 {
-    public class RateLimitAttribute : ActionFilterAttribute
+    public class RateLimitAttribute(int limit, int resetIntervalInSeconds) : ActionFilterAttribute
     {
-        private readonly int _limit;
-        private readonly TimeSpan _resetInterval;
-
-        public RateLimitAttribute(int limit, int resetIntervalInSeconds)
-        {
-            _limit = limit;
-            _resetInterval = TimeSpan.FromSeconds(resetIntervalInSeconds);
-        }
+        private readonly TimeSpan _resetInterval = TimeSpan.FromSeconds(resetIntervalInSeconds);
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -48,7 +41,7 @@ namespace ShareAPI.Controllers
                 return 0;
             });
 
-            if (requests >= _limit)
+            if (requests >= limit)
             {
                 context.Result = new ContentResult
                 {

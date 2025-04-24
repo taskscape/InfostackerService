@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Markdig;
 
-namespace ShareAPI.Services;
+namespace Infostacker.Services;
 
 public partial class SharingService : ISharingService
 {
@@ -124,9 +124,6 @@ public partial class SharingService : ISharingService
         foreach (string pdfUrl in pdfUrls)
         {
             scriptTemplate = scriptTemplate.Replace("{pdfUrl}", $"\"{pdfUrl}\"");
-            scriptTemplate = scriptTemplate.Replace("{pdfDivId}", $"{Guid.NewGuid()}");
-            scriptTemplate = scriptTemplate.Replace("{pdfName}", $"\"{Path.GetFileName(pdfUrl)}\"");
-            scriptTemplate = scriptTemplate.Replace("{token}", $"\"{_configuration.GetSection("AdobeAPIToken").Value}\"");
             MatchCollection matches = regex.Matches(htmlTemplate);
             foreach (Match match in matches)
             {
@@ -167,12 +164,12 @@ public partial class SharingService : ISharingService
                 break;
             }
         }
-        List<string> acceptedImageFormats = new List<string>
-        {
+        List<string> acceptedImageFormats =
+        [
             ".jpg",
             ".jpeg",
             ".png"
-        };
+        ];
         // Getting images
         IEnumerable<string> imageFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => acceptedImageFormats.Contains(Path.GetExtension(file).ToLowerInvariant()));
@@ -200,10 +197,7 @@ public partial class SharingService : ISharingService
             }
         }
 
-        List<string> acceptedVideoFormats = new List<string>
-        {
-            ".mp4"
-        };
+        List<string> acceptedVideoFormats = [".mp4"];
         // Getting videos
         IEnumerable<string> videoFiles = Directory.GetFiles(Path.Combine(NotesFolderPath, identifier))
             .Where(file => acceptedVideoFormats.Contains(Path.GetExtension(file).ToLowerInvariant()));
@@ -302,7 +296,7 @@ public partial class SharingService : ISharingService
             Version = BuildVersion,
             CompilationDate = File.GetLastAccessTime(GetType().Assembly.Location)
         };
-        return Task.FromResult((object)versionInfo);
+        return Task.FromResult<object>(versionInfo);
     }
 
     private async Task SaveFiles(string markdown, List<IFormFile> files, string directoryPath)

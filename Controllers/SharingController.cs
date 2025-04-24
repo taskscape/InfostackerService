@@ -1,8 +1,8 @@
 using System.Net;
+using Infostacker.Services;
 using Microsoft.AspNetCore.Mvc;
-using ShareAPI.Services;
 
-namespace ShareAPI.Controllers;
+namespace Infostacker.Controllers;
 
 [ApiController]
 [Route("sharing")]
