@@ -5,9 +5,16 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Infostacker.Controllers
 {
-    public class RateLimitAttribute(int limit, int resetIntervalInSeconds) : ActionFilterAttribute
+    public class RateLimitAttribute : ActionFilterAttribute
     {
-        private readonly TimeSpan _resetInterval = TimeSpan.FromSeconds(resetIntervalInSeconds);
+        private readonly int _limit;
+        private readonly TimeSpan _resetInterval;
+
+        public RateLimitAttribute(int limit, int resetIntervalInSeconds)
+        {
+            _limit = limit;
+            _resetInterval = TimeSpan.FromSeconds(resetIntervalInSeconds);
+        }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -41,7 +48,7 @@ namespace Infostacker.Controllers
                 return 0;
             });
 
-            if (requests >= limit)
+            if (requests >= _limit)
             {
                 context.Result = new ContentResult
                 {

@@ -2,6 +2,7 @@ using Infostacker.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using Serilog.Core;
+using SharingService = Infostacker.Services.SharingService;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 string? MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
