@@ -18,18 +18,15 @@ if (string.IsNullOrWhiteSpace(seqServer))
     seqServer = "https://localhost:5341";
 }
 
-Serilog.ILogger logger = new LoggerConfiguration()
-    .Enrich.WithProperty("Application", "InfostackerService")
-    .WriteTo.Console()
-    .WriteTo.File("Logs/logs.txt", rollingInterval: RollingInterval.Day)
-    .WriteTo.Seq(seqServer)
-    .MinimumLevel.Information()
-    .CreateLogger();
-
-Log.Logger = logger;
-
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
+builder.Host.UseSerilog((_, _, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .Enrich.WithProperty("Application", "InfostackerService")
+        .WriteTo.Console()
+        .WriteTo.File("Logs/logs.txt", rollingInterval: RollingInterval.Day)
+        .WriteTo.Seq(seqServer)
+        .MinimumLevel.Information();
+});
 
 builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
