@@ -27,6 +27,8 @@ public partial class SharingService : ISharingService
         TemplateScriptPath = _configuration.GetSection("TemplateScriptPath").Value ?? string.Empty;
         BuildVersion = _configuration.GetSection("version").Value ?? string.Empty;
         MaxFileSize = int.Parse(_configuration.GetSection("MaxFileSizeInBytes").Value);
+        
+        
     }
 
     public async Task<Guid> UploadMarkdownWithFiles(string markdown, List<IFormFile> files)
