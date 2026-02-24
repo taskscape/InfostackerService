@@ -9,10 +9,12 @@ namespace Infostacker.Controllers;
 public class SharingController : ControllerBase
 {
     private readonly ISharingService _sharingService;
+    private readonly ILogger<SharingController> _logger;
 
-    public SharingController(ISharingService sharingService)
+    public SharingController(ISharingService sharingService, ILogger<SharingController> logger)
     {
         _sharingService = sharingService;
+        _logger = logger;
     }
 
     [HttpPost("uploadmarkdownwithfiles")]
@@ -34,7 +36,7 @@ public class SharingController : ControllerBase
         string? result = await _sharingService.GetMarkdownContent(identifier);
         if (result is null)
         {
-            return NotFound(new { Message = "No markdown or files with given identifier found.", id = identifier });
+            return LogAndReturnNotFound("No markdown or files with given identifier found.", identifier);
         }
 
         return new ContentResult {
@@ -49,7 +51,7 @@ public class SharingController : ControllerBase
     {
         if (!await _sharingService.UpdateMarkdownWithFiles(markdown, files, identifier))
         {
-            return NotFound(new { Message = "No markdown or files with given identifier found.", id = identifier });
+            return LogAndReturnNotFound("No markdown or files with given identifier found.", identifier.ToString());
         }
 
         return Ok(new { Message = "Markdown and files updated successfully.", id = identifier });
@@ -61,7 +63,7 @@ public class SharingController : ControllerBase
 
         if (!await _sharingService.DeleteMarkdownWithFiles(identifier))
         {
-            return NotFound(new { Message = "No markdown or files with given identifier found.", id = identifier });
+            return LogAndReturnNotFound("No markdown or files with given identifier found.", identifier);
         }
 
         return Ok(new { Message = "Markdown and files successfully deleted.", id = identifier });
@@ -73,7 +75,7 @@ public class SharingController : ControllerBase
         FileStream stream = await _sharingService.GetPdf(identifier, fileName);
         if (stream is null)
         {
-            return NotFound(new { Message = "PDF does not exist.", id = identifier });
+            return LogAndReturnNotFound("PDF does not exist.", identifier, fileName);
         }
         return File(stream, "application/pdf");
     }
@@ -84,7 +86,7 @@ public class SharingController : ControllerBase
         FileStream stream = await _sharingService.GetDoc(identifier, fileName);
         if (stream is null)
         {
-            return NotFound(new { Message = "Doc does not exist.", id = identifier });
+            return LogAndReturnNotFound("Doc does not exist.", identifier, fileName);
         }
         return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     }
@@ -95,7 +97,7 @@ public class SharingController : ControllerBase
         FileStream stream = await _sharingService.GetImage(identifier, fileName);
         if (stream is null)
         {
-            return NotFound(new { Message = "Image does not exist.", id = identifier });
+            return LogAndReturnNotFound("Image does not exist.", identifier, fileName);
         }
         return File(stream, "image/png");
     }
@@ -106,7 +108,7 @@ public class SharingController : ControllerBase
         FileStream stream = await _sharingService.GetVideo(identifier, fileName);
         if (stream is null)
         {
-            return NotFound(new { Message = "Video does not exist.", id = identifier });
+            return LogAndReturnNotFound("Video does not exist.", identifier, fileName);
         }
         return File(stream, "video/mp4");
     }
@@ -115,5 +117,18 @@ public class SharingController : ControllerBase
     public async Task<IActionResult> GetVersion()
     {
         return Ok(await _sharingService.GetVersion());
+    }
+
+    private IActionResult LogAndReturnNotFound(string message, string identifier, string? fileName = null)
+    {
+        _logger.LogWarning(
+            "Requested resource was not found. Message: {Message}. Identifier: {Identifier}. FileName: {FileName}. Path: {Path}. TraceId: {TraceId}",
+            message,
+            identifier,
+            fileName,
+            HttpContext.Request.Path.Value,
+            HttpContext.TraceIdentifier);
+
+        return NotFound(new { Message = message, id = identifier });
     }
 }
