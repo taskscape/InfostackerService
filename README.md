@@ -17,10 +17,18 @@
 1. Clone the repository.
 2. Open the repository with your preferred IDE (For guide purposes, I will use Visual Studio).
 3. Go to `appsettings.json` and fill in the path where notes should be stored on the server (`NotesFolder`) and paste your Adobe token into `AdobeAPIToken`.
-4. Publish the solution. (For detailed instructions, see "Publishing with Visual Studio" below)
-5. Open up IIS.
-6. Expand connections list, right click on "Sites" and press "Add website".
-7. Choose a name for the website, ex. "SharingAPI". Then, for physical path, pick the location where you published the project to. In the Binding section, choose whatever you want to host it under. Then, press OK.
+4. Review security limits in `appsettings.json` and tune them for your deployment:
+   - `MaxFileSizeInBytes`
+   - `MaxFilesPerUpload`
+   - `MaxTotalUploadBytes`
+   - `MaxMarkdownLength`
+   - `MaxRequestBodySizeInBytes`
+   - `RateLimiting.ReadRequestsPerMinute`
+   - `RateLimiting.WriteRequestsPerMinute`
+5. Publish the solution. (For detailed instructions, see "Publishing with Visual Studio" below)
+6. Open up IIS.
+7. Expand connections list, right click on "Sites" and press "Add website".
+8. Choose a name for the website, ex. "SharingAPI". Then, for physical path, pick the location where you published the project to. In the Binding section, choose whatever you want to host it under. Then, press OK.
 
 ## Publishing with Visual Studio
 
@@ -75,7 +83,7 @@ To enable CORS (Cross-Origin Resource Sharing) on an IIS server, you can add COR
     - '*' `<allowHeaders>` specifies the allowed request headers.
     - '*' `<exposeHeaders>` specifies the headers that the server exposes to the client.
 
-    <sub><sup>'*' - optional tags</sup></sub>
+    <sub>'*' - optional tags</sub>
 
 4. **Save Changes**: After adding the CORS configuration to the `web.config` file, save the changes.
 
