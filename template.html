@@ -7,173 +7,425 @@
     <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
+        :root {
+            --bg: #eef3f8;
+            --bg-accent: #d8e5f4;
+            --paper: #ffffff;
+            --ink: #15202d;
+            --ink-soft: #4b5d72;
+            --border: #d8e0ea;
+            --accent: #0a5ab2;
+            --accent-strong: #094a91;
+            --code-bg: #111a27;
+            --code-ink: #dce8f5;
+            --card-shadow: 0 22px 42px -34px rgba(14, 30, 56, 0.45);
+        }
+
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            display: flex;
-            flex-direction: column;
             min-height: 100vh;
-            font-family: "Poppins", Arial, sans-serif;
+            font-family: "IBM Plex Sans", "Segoe UI Variable", "Noto Sans", sans-serif;
             overflow-wrap: break-word;
-            background-color: #F9F9F9;
-            color: #333;
-            line-height: 1.6;
+            background: radial-gradient(1200px 700px at 12% -15%, var(--bg-accent), var(--bg));
+            color: var(--ink);
+            line-height: 1.75;
+            font-size: 16px;
         }
 
         .upperline {
-            border-top: 5px solid #2a6fc3;
+            height: 6px;
+            background: linear-gradient(90deg, var(--accent) 0%, #4b8cd4 40%, var(--accent) 100%);
         }
 
         .container {
-            flex-grow: 1; /* Content will take up remaining space */
+            flex-grow: 1;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             width: 100%;
-            padding: 20px;
-            padding-bottom: 0px;
-            margin-bottom: 0px;
+            padding: clamp(18px, 3vw, 36px) clamp(12px, 4vw, 30px);
         }
 
         .content {
-            max-width: 1000px;
+            max-width: 940px;
             width: 100%;
-            background-color: #F9F9F9;
-            padding: 20px;
-            min-height: calc(100vh - 135px);
+            background-color: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--card-shadow);
+            padding: clamp(20px, 4vw, 42px);
+            min-height: calc(100vh - 190px);
+            animation: content-rise 420ms ease-out;
         }
 
-            .content img {
-                width: 100%;
-                height: auto;
-                display: block;
-            }
+        .content > * {
+            animation: fade-in 300ms ease-out both;
+        }
 
-            .content ol,
-            .content ul {
-                padding-left: 20px;
-            }
+        .content > *:nth-child(1) {
+            animation-delay: 40ms;
+        }
 
-            .content h1,
-            .content h2,
-            .content h3,
-            .content h4,
-            .content h5,
-            .content h6 {
-                margin-top: 1em;
-                margin-bottom: 0.5em;
-                color: #333;
-                font-weight: normal;
-            }
+        .content > *:nth-child(2) {
+            animation-delay: 90ms;
+        }
 
-            .content h1 {
-                font-size: 40px;
-            }
+        .content > *:nth-child(3) {
+            animation-delay: 130ms;
+        }
 
-            .content h2 {
-                font-size: 36px;
-            }
+        .content > *:nth-child(4) {
+            animation-delay: 170ms;
+        }
 
-            .content h3 {
-                font-size: 24px;
-            }
+        .content > *:nth-child(5) {
+            animation-delay: 220ms;
+        }
 
-            .content h4 {
-                font-size: 20px;
-            }
+        .content > *:nth-child(n+6) {
+            animation-delay: 260ms;
+        }
 
-            .content h5 {
-                font-size: 18px;
-            }
+        .content img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin: 1.35rem 0;
+        }
 
-            .content h6 {
-                font-size: 16px;
-            }
+        .content ol,
+        .content ul {
+            margin: 0.8rem 0 1.2rem;
+            padding-left: 1.4rem;
+        }
 
-            .content p {
-                font-size: 18px; /* Slightly larger font size for better readability */
-                margin-bottom: 1em;
-                line-height: 1.6; /* Ensure consistent line spacing */
-            }
+        .content li {
+            margin: 0.35rem 0;
+            font-size: 1.03rem;
+        }
+
+        .content h1,
+        .content h2,
+        .content h3,
+        .content h4,
+        .content h5,
+        .content h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.55em;
+            color: var(--ink);
+            font-family: "Manrope", "IBM Plex Sans", sans-serif;
+            line-height: 1.25;
+            letter-spacing: -0.015em;
+        }
+
+        .content h1 {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-top: 0.2rem;
+        }
+
+        .content h2 {
+            font-size: clamp(1.55rem, 3vw, 1.9rem);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.25rem;
+        }
+
+        .content h3 {
+            font-size: clamp(1.3rem, 2.3vw, 1.5rem);
+            font-weight: 700;
+        }
+
+        .content h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .content h5 {
+            font-size: 1.08rem;
+            font-weight: 700;
+        }
+
+        .content h6 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+        }
+
+        .content p {
+            font-size: 1.06rem;
+            margin-bottom: 1.05rem;
+            color: var(--ink);
+            max-width: 72ch;
+        }
+
+        .content p.lead-title {
+            font-family: "Manrope", "IBM Plex Sans", sans-serif;
+            font-size: clamp(1.85rem, 4.4vw, 2.6rem);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.1rem;
+            max-width: 32ch;
+            color: var(--ink);
+        }
+
+        .content p.tags-heading {
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--ink-soft);
+        }
+
+        .content ul.tags-list {
+            list-style: none;
+            padding-left: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        .content ul.tags-list li {
+            margin: 0;
+            font-size: 0.83rem;
+            padding: 0.22rem 0.65rem;
+            border-radius: 999px;
+            border: 1px solid #c7d8ea;
+            background: #f4f8fd;
+            color: var(--accent-strong);
+        }
+
+        .content a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-color: rgba(10, 90, 178, 0.35);
+            text-decoration-thickness: 1px;
+        }
+
+        .content a:hover {
+            color: var(--accent-strong);
+            text-decoration-color: currentColor;
+        }
+
+        .content hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 1.6rem 0;
+        }
+
+        .content code {
+            font-family: "IBM Plex Mono", "Cascadia Mono", monospace;
+            font-size: 0.92em;
+            background: #edf2f8;
+            border: 1px solid #d4deea;
+            border-radius: 6px;
+            padding: 0.12em 0.38em;
+        }
+
+        .content pre {
+            background: var(--code-bg);
+            color: var(--code-ink);
+            border-radius: 10px;
+            padding: 1rem 1.05rem;
+            overflow: auto;
+            margin: 1rem 0 1.4rem;
+        }
+
+        .content pre code {
+            border: 0;
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 0.92rem;
+        }
+
+        .content blockquote {
+            border-left: 4px solid var(--accent);
+            background: #f4f8fc;
+            color: #213449;
+            margin: 1.15rem 0;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+        }
+
+        .content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0 1.4rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .content th,
+        .content td {
+            padding: 0.62rem 0.72rem;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .content th {
+            font-weight: 700;
+            background: #f5f8fc;
+            color: #2a3c50;
+        }
+
+        .content tr:last-child td {
+            border-bottom: 0;
+        }
 
         .footer {
-            background-color: #F9F9F9;
-            padding-left: 20px;
-            padding-right: 20px;
+            background-color: #f7fbff;
+            border-top: 1px solid var(--border);
+            padding: 14px clamp(14px, 3vw, 28px);
             width: 100%;
-            height: 110px; /* Fixed footer height */
-            box-sizing: border-box;
-            border-top: 5px solid #2a6fc3;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 16px;
         }
 
-            .footer img {
-                height: calc(0.75 * 50px); /* Set the height of the image */
-                margin-right: 20px;
-            }
+        .footer img {
+            height: 34px;
+            margin-right: 8px;
+        }
 
-            .footer .footer-content {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-end;
-            }
+        .footer .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            color: var(--ink-soft);
+        }
 
-                .footer .footer-content p {
-                    margin: 0;
-                    font-size: 10px;
-                }
+        .footer .footer-content p {
+            margin: 0;
+            font-size: 0.73rem;
+            line-height: 1.45;
+        }
 
-                .footer .footer-content a {
-                    color: #2a6fc3;
-                    text-decoration: none;
-                }
+        .footer .footer-content a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
 
         .pdf-container {
             display: flex;
-            flex-wrap: wrap;
-            height: 60%;
+            width: 100%;
+            margin: 1rem 0 1.4rem;
         }
 
         .pdf-container-item {
-            height: 50vw;
-            margin: 1%;
+            width: 100%;
+            min-height: clamp(420px, 72vh, 920px);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f7fafd;
         }
 
         .docs-container {
             display: flex;
-            flex-wrap: wrap;
-            height: 60%;
+            width: 100%;
+            margin: 1rem 0 1.4rem;
         }
 
+        .docs-container iframe {
+            width: 100%;
+            min-height: clamp(420px, 76vh, 980px);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f7fafd;
+        }
+
+        .video-container {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #0d1420;
+            margin: 1rem 0 1.4rem;
+        }
+
+        @keyframes content-rise {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .content,
+            .content > * {
+                animation: none;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .container {
+                padding: 14px 10px 18px;
+            }
+
+            .content {
+                border-radius: 10px;
+                min-height: auto;
+                padding: 16px;
+            }
+
+            .content p {
+                font-size: 1rem;
+            }
+
+            .content p.lead-title {
+                margin-top: 0.2rem;
+                margin-bottom: 0.9rem;
+            }
+
+            .pdf-container-item,
             .docs-container iframe {
-                width: 100%;
-                height: 90vh;
-                margin: 1%;
+                min-height: 56vh;
             }
 
-            @media (max-width: 600px) {
-                .content {
-                    padding: 15px;
-                }
-
-                    .content p {
-                        font-size: 18px; /* Slightly larger font size for better readability */
-                        margin-bottom: 1em;
-                        line-height: 1.6; /* Ensure consistent line spacing */
-                    }
-
-                .header {
-                    padding: 10px;
-                }
+            .footer {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 14px 12px;
             }
+
+            .footer .footer-content {
+                align-items: flex-start;
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body>
@@ -192,29 +444,27 @@
     </div>
     <script type="text/javascript">
         window.onload = function () {
-            // Style the first <p> element as <h1>
-            const firstParagraph = document.querySelector('p');
-            if (firstParagraph) {
-                firstParagraph.style.fontSize = '40px';
-                firstParagraph.style.fontWeight = 'bold';
-                firstParagraph.style.marginTop = '1em';
-                firstParagraph.style.marginBottom = '0.5em';
-                firstParagraph.style.color = '#333'; // Match the color for <h1>
-                // Add more styles if needed
+            const content = document.querySelector('.content');
+            if (!content) {
+                return;
             }
 
-            // Existing code to style the "tags:" paragraph
-            const tagsParagraph = Array.from(document.querySelectorAll('p')).find(p => p.innerText.trim() === 'tags:');
+            const firstRenderableElement = Array.from(content.children).find(child =>
+                child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE'
+            );
+
+            if (firstRenderableElement && firstRenderableElement.tagName.toLowerCase() === 'p') {
+                firstRenderableElement.classList.add('lead-title');
+            }
+
+            const tagsParagraph = Array.from(content.querySelectorAll('p'))
+                .find(p => p.innerText.trim().toLowerCase() === 'tags:');
+
             if (tagsParagraph) {
-                tagsParagraph.style.fontSize = '22px';
-                tagsParagraph.style.textTransform = 'uppercase';
-                tagsParagraph.style.fontWeight = 'bold';
-                tagsParagraph.style.marginBottom = '0';
+                tagsParagraph.classList.add('tags-heading');
                 const tagsList = tagsParagraph.nextElementSibling;
                 if (tagsList && tagsList.tagName.toLowerCase() === 'ul') {
-                    tagsList.style.listStylePosition = 'inside';
-                    tagsList.style.paddingLeft = '4px';
-                    tagsList.style.marginTop = '0';
+                    tagsList.classList.add('tags-list');
                 }
             }
         };
