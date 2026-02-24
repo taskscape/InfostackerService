@@ -18,7 +18,6 @@ public class SharingController : ControllerBase
     }
 
     [HttpPost("uploadmarkdownwithfiles")]
-    [RateLimit(100, 86400)]
     public async Task<IActionResult> UploadMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files)
     {
         Guid identifier = await _sharingService.UploadMarkdownWithFiles(markdown, files);
@@ -30,13 +29,13 @@ public class SharingController : ControllerBase
         return Ok(new { Message = "Markdown and files uploaded successfully.", id = identifier });
     }
 
-    [HttpGet("{identifier}")]
-    public async Task<IActionResult> GetMarkdownContent(string identifier)
+    [HttpGet("{identifier:guid}")]
+    public async Task<IActionResult> GetMarkdownContent(Guid identifier)
     {
         string? result = await _sharingService.GetMarkdownContent(identifier);
         if (result is null)
         {
-            return LogAndReturnNotFound("No markdown or files with given identifier found.", identifier);
+            return LogAndReturnNotFound("No markdown or files with given identifier found.", identifier.ToString());
         }
 
         return new ContentResult {
@@ -46,7 +45,7 @@ public class SharingController : ControllerBase
         };
     }
 
-    [HttpPut("{identifier}")]
+    [HttpPut("{identifier:guid}")]
     public async Task<IActionResult> UpdateMarkdownWithFiles([FromForm] string markdown, [FromForm] List<IFormFile> files, Guid identifier)
     {
         if (!await _sharingService.UpdateMarkdownWithFiles(markdown, files, identifier))
@@ -57,58 +56,58 @@ public class SharingController : ControllerBase
         return Ok(new { Message = "Markdown and files updated successfully.", id = identifier });
     }
 
-    [HttpDelete("{identifier}")]
-    public async Task<IActionResult> DeleteMarkdownWithFiles(string identifier)
+    [HttpDelete("{identifier:guid}")]
+    public async Task<IActionResult> DeleteMarkdownWithFiles(Guid identifier)
     {
 
         if (!await _sharingService.DeleteMarkdownWithFiles(identifier))
         {
-            return LogAndReturnNotFound("No markdown or files with given identifier found.", identifier);
+            return LogAndReturnNotFound("No markdown or files with given identifier found.", identifier.ToString());
         }
 
         return Ok(new { Message = "Markdown and files successfully deleted.", id = identifier });
     }
 
-    [HttpGet("pdf/{identifier}/{fileName}")]
-    public async Task<IActionResult> GetPdf(string identifier, string fileName)
+    [HttpGet("pdf/{identifier:guid}/{fileName}")]
+    public async Task<IActionResult> GetPdf(Guid identifier, string fileName)
     {
-        FileStream stream = await _sharingService.GetPdf(identifier, fileName);
+        FileStream? stream = await _sharingService.GetPdf(identifier, fileName);
         if (stream is null)
         {
-            return LogAndReturnNotFound("PDF does not exist.", identifier, fileName);
+            return LogAndReturnNotFound("PDF does not exist.", identifier.ToString(), fileName);
         }
         return File(stream, "application/pdf");
     }
 
-    [HttpGet("doc/{identifier}/{fileName}")]
-    public async Task<IActionResult> GetDoc(string identifier, string fileName)
+    [HttpGet("doc/{identifier:guid}/{fileName}")]
+    public async Task<IActionResult> GetDoc(Guid identifier, string fileName)
     {
-        FileStream stream = await _sharingService.GetDoc(identifier, fileName);
+        FileStream? stream = await _sharingService.GetDoc(identifier, fileName);
         if (stream is null)
         {
-            return LogAndReturnNotFound("Doc does not exist.", identifier, fileName);
+            return LogAndReturnNotFound("Doc does not exist.", identifier.ToString(), fileName);
         }
         return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     }
 
-    [HttpGet("image/{identifier}/{fileName}")]
-    public async Task<IActionResult> GetImage(string identifier, string fileName)
+    [HttpGet("image/{identifier:guid}/{fileName}")]
+    public async Task<IActionResult> GetImage(Guid identifier, string fileName)
     {
-        FileStream stream = await _sharingService.GetImage(identifier, fileName);
+        FileStream? stream = await _sharingService.GetImage(identifier, fileName);
         if (stream is null)
         {
-            return LogAndReturnNotFound("Image does not exist.", identifier, fileName);
+            return LogAndReturnNotFound("Image does not exist.", identifier.ToString(), fileName);
         }
         return File(stream, "image/png");
     }
     
-    [HttpGet("video/{identifier}/{fileName}")]
-    public async Task<IActionResult> GetVideo(string identifier, string fileName)
+    [HttpGet("video/{identifier:guid}/{fileName}")]
+    public async Task<IActionResult> GetVideo(Guid identifier, string fileName)
     {
-        FileStream stream = await _sharingService.GetVideo(identifier, fileName);
+        FileStream? stream = await _sharingService.GetVideo(identifier, fileName);
         if (stream is null)
         {
-            return LogAndReturnNotFound("Video does not exist.", identifier, fileName);
+            return LogAndReturnNotFound("Video does not exist.", identifier.ToString(), fileName);
         }
         return File(stream, "video/mp4");
     }
