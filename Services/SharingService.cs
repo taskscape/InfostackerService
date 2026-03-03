@@ -9,7 +9,7 @@ public partial class SharingService : ISharingService
     private static readonly MarkdownPipeline SafeMarkdownPipeline = new MarkdownPipelineBuilder()
         .DisableHtml()
         .Build();
-    private static readonly HashSet<string> AcceptedImageFormats = new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png" };
+    private static readonly HashSet<string> AcceptedImageFormats = new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".gif" };
     private static readonly HashSet<string> AcceptedVideoFormats = new(StringComparer.OrdinalIgnoreCase) { ".mp4" };
     private static readonly HashSet<string> AcceptedDocFormats = new(StringComparer.OrdinalIgnoreCase) { ".doc", ".docx" };
     private static readonly HashSet<string> AcceptedPdfFormats = new(StringComparer.OrdinalIgnoreCase) { ".pdf" };
@@ -21,6 +21,7 @@ public partial class SharingService : ISharingService
         ".jpg",
         ".jpeg",
         ".png",
+        ".gif",
         ".mp4"
     };
 
