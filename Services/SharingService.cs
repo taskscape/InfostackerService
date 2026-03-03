@@ -397,15 +397,30 @@ public partial class SharingService : ISharingService
         }
 
         string noteDirectoryPath = GetNoteDirectoryPath(identifier);
-        string rootPath = EnsureTrailingSeparator(Path.GetFullPath(noteDirectoryPath));
-        string candidatePath = Path.GetFullPath(Path.Combine(noteDirectoryPath, normalizedFileName));
-
-        if (!candidatePath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+        if (!Directory.Exists(noteDirectoryPath))
         {
             return false;
         }
 
-        filePath = candidatePath;
+        // To ensure we are only serving files that belong to this note and are in the correct format,
+        // we check if the file exists in the directory.
+        string candidatePath = Path.Combine(noteDirectoryPath, normalizedFileName);
+        
+        // Double check traversal (though Path.GetFileName already helps)
+        string rootPath = EnsureTrailingSeparator(Path.GetFullPath(noteDirectoryPath));
+        string fullCandidatePath = Path.GetFullPath(candidatePath);
+
+        if (!fullCandidatePath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!File.Exists(fullCandidatePath))
+        {
+            return false;
+        }
+
+        filePath = fullCandidatePath;
         return true;
     }
 

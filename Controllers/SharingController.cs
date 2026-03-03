@@ -76,7 +76,7 @@ public class SharingController : ControllerBase
         {
             return LogAndReturnNotFound("PDF does not exist.", identifier.ToString(), fileName);
         }
-        return File(stream, "application/pdf");
+        return File(stream, "application/pdf", enableRangeProcessing: true);
     }
 
     [HttpGet("doc/{identifier:guid}/{fileName}")]
@@ -109,7 +109,7 @@ public class SharingController : ControllerBase
         {
             return LogAndReturnNotFound("Video does not exist.", identifier.ToString(), fileName);
         }
-        return File(stream, "video/mp4");
+        return File(stream, "video/mp4", enableRangeProcessing: true);
     }
     
     [HttpGet("version")]
