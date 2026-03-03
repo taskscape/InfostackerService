@@ -126,10 +126,8 @@ public partial class SharingService : ISharingService
             }
 
             string workingScriptTemplate = scriptTemplate
-                .Replace("{pdfUrl}", $"\"{pdfUrl}\"")
-                .Replace("{pdfDivId}", $"{Guid.NewGuid():N}")
-                .Replace("{pdfName}", $"\"{fileName}\"")
-                .Replace("{token}", $"\"{_configuration.GetValue<string>("AdobeAPIToken") ?? string.Empty}\"");
+                .Replace("{pdfUrl}", pdfUrl)
+                .Replace("{pdfName}", fileName);
 
             htmlTemplate = ReplaceAttachmentReference(htmlTemplate, regex, fileName, workingScriptTemplate);
         }
