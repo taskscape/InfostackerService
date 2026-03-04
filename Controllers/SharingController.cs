@@ -98,7 +98,14 @@ public class SharingController : ControllerBase
         {
             return LogAndReturnNotFound("Image does not exist.", identifier.ToString(), fileName);
         }
-        return File(stream, "image/png");
+        string contentType = Path.GetExtension(fileName).ToLowerInvariant() switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".gif" => "image/gif",
+            ".png" => "image/png",
+            _ => "application/octet-stream"
+        };
+        return File(stream, contentType);
     }
     
     [HttpGet("video/{identifier:guid}/{fileName}")]
