@@ -419,10 +419,10 @@ public partial class SharingService : ISharingService
         HttpContext? httpContext = _httpContextAccessor.HttpContext;
         if (httpContext is null || string.IsNullOrWhiteSpace(httpContext.Request.Host.Value))
         {
-            return Uri.UnescapeDataString(relativeUrl);
+            return relativeUrl;
         }
 
-        return Uri.UnescapeDataString($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{relativeUrl}");
+        return $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{relativeUrl}";
     }
 
     private static string ExtractSafeTitle(string markdownContent, Regex attachmentRegex)
@@ -444,8 +444,13 @@ public partial class SharingService : ISharingService
         MatchCollection matches = regex.Matches(htmlTemplate);
         foreach (Match match in matches)
         {
-            string sanitizedMatch = Regex.Replace(WebUtility.HtmlDecode(match.Value), @"[^a-zA-Z0-9().\- ]", "_");
-            if (!sanitizedMatch.Contains(attachmentName, StringComparison.OrdinalIgnoreCase))
+            string decodedMatch = WebUtility.HtmlDecode(match.Value);
+            // Check if the link target (inside ![[...]]) matches the attachment name after sanitization
+            // Example: ![[My PDF.pdf]] -> sanitized: My_PDF.pdf
+            string linkTarget = decodedMatch.Trim('!', '[', ']');
+            string sanitizedTarget = Regex.Replace(linkTarget, @"[^a-zA-Z0-9().\- ]", "_");
+
+            if (!string.Equals(sanitizedTarget, attachmentName, StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
